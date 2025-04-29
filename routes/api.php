@@ -44,3 +44,22 @@ Route::group([
 
 });
 
+
+Route::middleware(['auth:api', 'admin'])->group(function () {
+    Route::post('/ping', function () {
+        return response()->json(['pong' => true]);
+    });
+});
+
+Route::middleware(['auth:api', 'consumer'])->group(function () {
+
+});
+
+Route::middleware(['auth:api', 'pharmacist'])->group(function () {
+
+});
+
+Route::middleware(['auth:api', 'delivery'])->group(function () {
+
+
+});

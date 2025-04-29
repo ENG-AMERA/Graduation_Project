@@ -19,6 +19,13 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array<int, string>
      */
+
+
+
+     /**
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Role[] $roles
+ */
+
     protected $fillable = [
         'firstname',
         'email',
