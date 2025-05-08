@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\ResetCodePassword;
+use App\Http\Services\authservice;
 use App\Http\Repositories\authrepo;
 use App\Http\Requests\Loginrequest;
-use Illuminate\Foundation\Auth\User;
+use App\Mail\SendCodeResetPassword;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\RegisterRequest;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Services\authservice;
-
 
 class UserController extends Controller
 {
@@ -18,7 +21,7 @@ class UserController extends Controller
 
     public function __construct( authservice $authservice , authrepo $authRepo)
     {
-       $this->middleware('auth:api', ['except' => ['login', 'register']]);
+       $this->middleware('auth:api', ['except' => ['login', 'register','userforgotpassword','userCheckcode','userResetPassword']]);
         $this->authservice  = $authservice;
         $this->authRepo = $authRepo;
     }
@@ -80,4 +83,56 @@ class UserController extends Controller
             'expires_in' => auth()->factory()->getTTL() * 60
         ]);
     }
-}
+
+    public function userforgotpassword(Request $request) {
+        $data =$request->validate([
+            'email'=> 'required|exists:users'
+        ]);
+
+       $existing = ResetCodePassword::query()->firstWhere('email', $request['email']);
+        if ($existing) {
+           $existing->delete();
+         }
+        $data['code']=mt_rand(100000,999999);
+        $codeData=ResetCodePassword::query()->create($data);
+        Mail::to($request['email'])->send(new SendCodeResetPassword($codeData['code']));
+        return response()->json(['message'=>trans('code.sent')]);
+
+    }
+
+    public function userCheckcode(Request $request){
+        $request->validate([
+            'code'=>'required|string|exists:reset_code_passwords'
+        ]);
+        $passwordReset=ResetCodePassword::query()->firstWhere('code',$request['code']);
+        if($passwordReset['created_at'] < now()->subHour()){
+            $passwordReset->delete();
+            return response()->json(['message'=>trans('code is expired')],422);
+        }
+        return response()->json([
+            'code'=>$passwordReset['code'],
+            'message'=>trans('code is valid')
+            ]);
+    }
+
+    public function userResetPassword(Request $request){
+        $input=$request->validate([
+            'code'=>'required|string|exists:reset_code_passwords',
+            'password'=>'required'
+        ]);
+        $passwordReset=ResetCodePassword::query()->firstWhere('code',$request['code']);
+        if($passwordReset['created_at'] < now()->subHour()){
+            $passwordReset->delete();
+            return response()->json(['message'=>trans('password.code is expired')],422);
+        }
+        $user=User::query()->firstWhere('email',$passwordReset['email']);
+        $input['password'] = Hash::make($input['password']);
+        $user->update([
+            'password'=>$input['password'],
+        ]);
+        $passwordReset->delete();
+        return response()->json(['message'=>'password has been successfully reset']);
+    }
+
+    }
+
