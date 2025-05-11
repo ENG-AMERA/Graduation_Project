@@ -11,8 +11,10 @@ use App\Http\Requests\Loginrequest;
 use App\Mail\SendCodeResetPassword;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use App\Models\EmailVerificationCode;
 use App\Http\Requests\RegisterRequest;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 class UserController extends Controller
 {
@@ -21,7 +23,7 @@ class UserController extends Controller
 
     public function __construct( authservice $authservice , authrepo $authRepo)
     {
-       $this->middleware('auth:api', ['except' => ['login', 'register','userforgotpassword','userCheckcode','userResetPassword']]);
+       $this->middleware('auth:api', ['except' => ['login', 'register','userforgotpassword','userCheckcode','userResetPassword','verifyEmailCode','resendVerificationCode']]);
         $this->authservice  = $authservice;
         $this->authRepo = $authRepo;
     }
@@ -133,6 +135,59 @@ class UserController extends Controller
         $passwordReset->delete();
         return response()->json(['message'=>'password has been successfully reset']);
     }
+
+    public function verifyEmailCode(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'code' => 'required'
+    ]);
+
+    $record = EmailVerificationCode::where('email', $request->email)
+        ->where('code', $request->code)
+        ->first();
+
+    if (!$record) {
+        return response()->json(['message' => 'Your code is incorrect'], 422);
+    }
+
+    if ($record->created_at < now()->subHour()) {
+        $record->delete();
+        return response()->json(['message' => 'code is expired'], 422);
+    }
+
+    $user = User::where('email', $request->email)->first();
+    $user->email_verified_at = now();
+    $user->save();
+
+    $record->delete();
+
+    return response()->json(['message' => 'Your email is confirmed']);
+}
+
+public function resendVerificationCode(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email|exists:users,email',
+    ]);
+    $user = User::where('email', $request->email)->first();
+
+    EmailVerificationCode::where('email', $user->email)->delete();
+    $code = rand(100000, 999999);
+
+    EmailVerificationCode::create([
+        'email' => $user->email,
+        'code' => $code,
+        'created_at' => now(),
+    ]);
+
+    Mail::raw("Your verification code is $code", function ($message) use ($user) {
+        $message->to($user->email)->subject('Resend verification code');
+    });
+
+    return response()->json(['message' => 'Resending verification code is done']);
+}
+
 
     }
 

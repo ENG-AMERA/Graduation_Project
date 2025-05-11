@@ -35,8 +35,11 @@ Route::group([
     Route::post('/logout', [UserController::class, 'logout']);
     Route::post('/refresh', [UserController::class, 'refresh']);
     Route::post('/me', [UserController::class, 'me']);
+    Route::post('/verify-email-code', [UserController::class, 'verifyEmailCode']);
+    Route::post('/resendVerificationCode', [UserController::class, 'resendVerificationCode']);
 
 });
+
 
 
 Route::middleware(['auth:api', 'admin'])->group(function () {
