@@ -46,6 +46,11 @@ class PharmaController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-    
+
+   public function getPendingPharmacists()
+    {
+        $pharmacists = $this->pharmaService->getAllPending();
+        return response()->json($pharmacists);
+    }
 
 }

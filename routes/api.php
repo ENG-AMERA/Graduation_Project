@@ -46,7 +46,6 @@ Route::group([
 
 });
 
-
 Route::post('/accept_pharma', [PharmaController::class, 'accept']);
 Route::delete('/pharmacist/{id}', [PharmaController::class, 'deletePharmacist']);
 
@@ -58,8 +57,11 @@ Route::middleware(['auth:api', 'admin'])->group(function () {
         return response()->json(['pong' => true]);
     });
  
-});
+Route::get('/getPendingPharmacists', [PharmaController::class, 'getPendingPharmacists']);
 
+Route::get('/getPendingdelivery', [delivaryController::class, 'getPendingDelivery']);
+
+});
 Route::middleware(['auth:api', 'consumer'])->group(function () {
 
 });

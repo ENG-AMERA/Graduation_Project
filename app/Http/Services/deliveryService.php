@@ -49,4 +49,10 @@ class deliveryService
         }
     }
     
+
+    
+      public function getAllPending()
+    {
+        return $this->deliveryRepository->getPendingdelivery();
+    }
 }

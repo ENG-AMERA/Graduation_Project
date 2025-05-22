@@ -12,4 +12,9 @@ class Delivery extends Model
     protected $fillable=[
         'user_id','delivery_method','number_method'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

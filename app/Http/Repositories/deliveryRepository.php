@@ -51,4 +51,11 @@ class deliveryRepository
         }
     }
     
+
+       public function getPendingdelivery()
+    {
+        return Delivery::with(['user'])
+            ->whereNull('accept')
+            ->get();
+    }
 }

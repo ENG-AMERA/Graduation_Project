@@ -43,4 +43,12 @@ class delivaryController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+     public function getPendingDelivery()
+    {
+        $delivery = $this->deliveryService->getAllPending();
+        return response()->json($delivery);
+    }
+
+
 }

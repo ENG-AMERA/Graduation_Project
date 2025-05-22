@@ -42,6 +42,15 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return $this->hasMany(Role::class);
     }
 
+  public function pharmacist()
+    {
+        return $this->hasOne(Pharmacist::class);
+    }
+    
+    public function delivery()
+    {
+        return $this->hasOne(Delivery::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

@@ -12,4 +12,9 @@ class Pharma extends Model
     protected $fillable = [
         'name','license','phone','length','width'
     ];
+    
+    public function pharmacists()
+    {
+        return $this->hasMany(Pharmacist::class);
+    }
 }

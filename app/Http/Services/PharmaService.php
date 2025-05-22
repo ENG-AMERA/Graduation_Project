@@ -16,7 +16,7 @@ class PharmaService
     {
         $this->pharmaRepository = $pharmaRepository;
     }
-
+/*
     public function createPharma(array $data)
     {
         // Create Pharma
@@ -41,7 +41,57 @@ class PharmaService
             'pharma' => $pharma,
             'pharmacist' => $pharmacist,
         ];
+    }*/
+
+public function createPharma(array $data)
+{
+
+    if (isset($data['license']) && $data['license']) {
+        $license = $data['license'];
+        $licenseExtension = $license->getClientOriginalExtension();
+        $licenseName = time() . '_license.' . $licenseExtension;
+        $licensePath = 'licenses'; // Path to save the image
+        $license->move(public_path($licensePath), $licenseName);
+        $licenseRelativePath = $licensePath . '/' . $licenseName;
+        $licenseFullUrl = url($licenseRelativePath); // Full URL for accessing the image
+        $data['license'] = $licenseFullUrl; // Store URL
     }
+
+    if (isset($data['certificate']) && $data['certificate']) {
+        $certificate = $data['certificate'];
+        $certificateExtension = $certificate->getClientOriginalExtension();
+        $certificateName = time() . '_certificate.' . $certificateExtension;
+        $certificatePath = 'certificates'; // Path to save the image
+        $certificate->move(public_path($certificatePath), $certificateName);
+        $certificateRelativePath = $certificatePath . '/' . $certificateName;
+        $certificateFullUrl = url($certificateRelativePath); // Full URL for accessing the image
+        $data['certificate'] = $certificateFullUrl; // Store URL
+    }
+
+
+    $pharma = $this->pharmaRepository->createPharma([
+        'length' => $data['length'],
+        'width' => $data['width'],
+        'name' => $data['name'],
+        'license' => $data['license'], // Store the URL of the uploaded license image
+        'phone' => $data['phone'],
+    ]);
+
+    $userId = Auth::id();
+
+   
+    $pharmacist = $this->pharmaRepository->createPharmacist([
+        'certificate' => $data['certificate'], // Store the URL of the uploaded certificate image
+        'description' => $data['description'] ?? null,
+        'user_id' => $userId,
+        'pharma_id' => $pharma->id,
+    ]);
+
+    return [
+        'pharma' => $pharma,
+        'pharmacist' => $pharmacist,
+    ];
+}
 
     public function accept($id)
     {
@@ -57,4 +107,9 @@ class PharmaService
         }
     }
     
+
+      public function getAllPending()
+    {
+        return $this->pharmaRepository->getPendingPharmacists();
+    }
 }

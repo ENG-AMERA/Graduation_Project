@@ -52,5 +52,13 @@ class PharmaRepository
             throw new \Exception("Error deleting pharmacist and pharma: " . $e->getMessage());
         }
     }
+
+  
     
+      public function getPendingPharmacists()
+    {
+        return Pharmacist::with(['user', 'pharma'])
+            ->whereNull('accept')
+            ->get();
+    }
 }
