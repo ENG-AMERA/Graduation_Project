@@ -6,7 +6,8 @@ use App\Http\Requests\PharmaRequest;
 use App\Http\Services\PharmaService;
 
 use App\Http\Requests\AcceptPharmacistRequest;
-
+use App\Http\Requests\AcceptOrder;
+use App\Http\Requests\Refuseorder;
 
 class PharmaController extends Controller
 {
@@ -52,5 +53,32 @@ class PharmaController extends Controller
         $pharmacists = $this->pharmaService->getAllPending();
         return response()->json($pharmacists);
     }
+
+    public function getAvailablePublicOrders()
+    {
+        $orders = $this->pharmaService->getAvailablePublicOrders();
+        return response()->json($orders);
+    }
+ public function getAvailablePrivateOrders()
+    {
+        $orders = $this->pharmaService->getAvailablePrivateOrders();
+        return response()->json($orders);
+    }
+
+
+
+
+    public function acceptOrder(AcceptOrder $request )
+{
+    return $this->pharmaService->acceptOrder($request->validated());
+}
+
+
+public function refuseOrder(Refuseorder $request)
+
+{
+    return $this->pharmaService->refuseOrder($request->validated());
+}
+
 
 }

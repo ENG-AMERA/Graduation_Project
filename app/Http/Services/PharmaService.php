@@ -112,4 +112,33 @@ public function createPharma(array $data)
     {
         return $this->pharmaRepository->getPendingPharmacists();
     }
+
+
+    
+ public function getAvailablePublicOrders()
+    {
+        return $this->pharmaRepository->getAvailablePublicOrders();
+    }
+
+      
+ public function getAvailablePrivateOrders()
+    {
+        return $this->pharmaRepository->getAvailablePrivateOrders();
+    }
+
+
+    public function acceptOrder(array $data)
+{
+    return $this->pharmaRepository->acceptOrder($data);
+}
+
+
+public function refuseOrder(array $data)
+{
+    return $this->pharmaRepository->refuseOrder($data);
+}
+
+
+
+
 }

@@ -15,6 +15,20 @@ class Pharma extends Model
     
     public function pharmacists()
     {
-        return $this->hasMany(Pharmacist::class);
+        return $this->hasOne(Pharmacist::class);
     }
+
+    public function users()
+{
+    return $this->belongsToMany(User::class)
+                ->using(PharmaUser::class)
+                ->withPivot('type', 'reason')
+                ->withTimestamps();
+}
+
+
+public function pharmaUsers()
+{
+    return $this->hasMany(PharmaUser::class);
+}
 }

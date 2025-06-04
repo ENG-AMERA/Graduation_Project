@@ -1,8 +1,12 @@
 <?php
 namespace App\Http\Repositories;
+
+use App\Models\DeliveryRequest;
 use App\Models\Pharma;
 use App\Models\Pharmacist;
 use App\Models\Role;
+use App\Models\PharmaUser;
+use Illuminate\Support\Facades\Auth;
 class PharmaRepository
 {
     public function createPharma(array $data)
@@ -61,4 +65,122 @@ class PharmaRepository
             ->whereNull('accept')
             ->get();
     }
+
+    
+    public function getAvailablePublicOrders()
+    {
+        return PharmaUser::with('order')
+            ->where('type', 0)
+            ->where('accept_pharma',null)
+            ->whereNull('pharma_id')
+            ->get();
+    }
+
+    
+public function getAvailablePrivateOrders()
+{
+    $user = Auth::user();
+
+    // Get the pharmacist based on user ID
+    $pharmacist = Pharmacist::where('user_id', $user->id)->first();
+
+    if (!$pharmacist) {
+        throw new \Exception('Pharmacist not found for this user.');
+    }
+
+    $pharmaId = $pharmacist->pharma_id;
+
+    // Get private orders where pharma_id matches
+    return PharmaUser::with('order')
+        ->where('type', 1)
+        ->where('accept_pharma',null)
+        ->where('pharma_id', $pharmaId)
+        ->get();
+}
+
+public function acceptOrder(array $data)
+{
+
+
+    // Find the PharmaUser record
+     $pharmaUser = PharmaUser::where('order_id', $data['order_id'])->first();
+
+
+    if (!$pharmaUser) {
+        return response()->json(['message' => 'PharmaUser not found'], 404);
+    }
+    
+    $user = Auth::user();
+
+    // Get the pharmacist based on user ID
+    $pharmacist = Pharmacist::where('user_id', $user->id)->first();
+
+    if (!$pharmacist) {
+        throw new \Exception('Pharmacist not found for this user.');
+    }
+
+    $pharmaId = $pharmacist->pharma_id;
+
+
+    // Update accept_pharma = 1
+    $pharmaUser->update([
+        'accept_pharma' => 1,
+        'pharma_id'=>$pharmaId
+
+
+]);
+// Create a DeliveryRequest with null qr, price, delivery_id
+    DeliveryRequest::create([
+        'qr' => null,
+        'price' => $data['price'],
+        'delivery_id' => null,
+        'pharma_user_id' => $pharmaUser->id,
+    ]);
+ 
+
+    return response()->json(['message' => 'Order accepted and delivery request created'], 200);
+}
+
+
+public function refuseOrder(array $data)
+{
+    $pharmaUser = PharmaUser::where('order_id', $data['order_id'])->first();
+
+    if (!$pharmaUser) {
+        return response()->json(['message' => 'PharmaUser not found'], 404);
+    }
+
+       $user = Auth::user();
+
+    // Get the pharmacist based on user ID
+    $pharmacist = Pharmacist::where('user_id', $user->id)->first();
+
+    if (!$pharmacist) {
+        throw new \Exception('Pharmacist not found for this user.');
+    }
+
+    $pharmaId = $pharmacist->pharma_id;
+
+
+
+    // Update accept_pharma and reason
+    $pharmaUser->update([
+        'accept_pharma' => 0,
+        'reason' => $data['reason'],
+          'pharma_id'=>$pharmaId
+
+    ]);
+
+    // Create delivery request with null fields
+    DeliveryRequest::create([
+        'qr' => null,
+        'price' => null,
+        'delivery_id' => null,
+        'pharma_user_id' => $pharmaUser->id,
+    ]);
+
+    return response()->json(['message' => 'Order refused and delivery request created'], 200);
+}
+
+
 }

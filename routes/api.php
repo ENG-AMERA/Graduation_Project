@@ -5,9 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PharmaController;
 use App\Http\Controllers\delivaryController;
+use App\Http\Controllers\OrdersController;
 
-
-
+use App\Http\Controllers\QrCodeController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -46,11 +46,6 @@ Route::group([
 
 });
 
-Route::post('/accept_pharma', [PharmaController::class, 'accept']);
-Route::delete('/pharmacist/{id}', [PharmaController::class, 'deletePharmacist']);
-
-Route::post('/accept_delivary', [delivaryController::class, 'accept']);
-Route::delete('/delivary/{id}', [delivaryController::class, 'deletdelivery']);
 
 Route::middleware(['auth:api', 'admin'])->group(function () {
     Route::post('/ping', function () {
@@ -61,16 +56,44 @@ Route::get('/getPendingPharmacists', [PharmaController::class, 'getPendingPharma
 
 Route::get('/getPendingdelivery', [delivaryController::class, 'getPendingDelivery']);
 
+Route::post('/accept_pharma', [PharmaController::class, 'accept']);
+Route::delete('/pharmacist/{id}', [PharmaController::class, 'deletePharmacist']);
+
+Route::post('/accept_delivary', [delivaryController::class, 'accept']);
+Route::delete('/delivary/{id}', [delivaryController::class, 'deletdelivery']);
+
 });
 Route::middleware(['auth:api', 'consumer'])->group(function () {
+
+Route::post('/public_order',[OrdersController::class,'Order']);
+Route::post('/OrderPrivate',[OrdersController::class,'OrderPrivate']);
+Route::post('/showQrFromDatabase', [QrCodeController::class, 'showQrFromDatabase']);
+
+Route::get('get_order_price', [OrdersController::class, 'index']);
 
 });
 
 Route::middleware(['auth:api', 'pharmacist'])->group(function () {
+Route::post('getAvailablePublicOrders', [PharmaController::class, 'getAvailablePublicOrders']);
+Route::post('getAvailablePrivateOrders', [PharmaController::class, 'getAvailablePrivateOrders']);
+Route::post('acceptOrder', [PharmaController::class, 'acceptOrder']);
+
+Route::post('refuseOrder', [PharmaController::class, 'refuseOrder']);
 
 });
 
 Route::middleware(['auth:api', 'delivery'])->group(function () {
+    
+Route::post('/generate-qr', [QrCodeController::class, 'generate']);
+    
+Route::post('/verifyQr', [QrCodeController::class, 'verifyQr']);
+
+    
+Route::post('/getPendingRequests', [delivaryController::class, 'getPendingRequests']);
 
 
 });
+
+//show order to delivery when user and pharma accept 
+//accept user on price
+//make three layer for qr

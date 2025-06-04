@@ -55,4 +55,11 @@ class deliveryService
     {
         return $this->deliveryRepository->getPendingdelivery();
     }
+
+
+    
+    public function getPendingDeliveryRequests()
+    {
+        return $this->deliveryRepository->getPendingRequestsWithPharmaAndOrder();
+    }
 }

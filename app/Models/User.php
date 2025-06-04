@@ -42,6 +42,11 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return $this->hasMany(Role::class);
     }
 
+
+    public function orders()
+     {
+    return $this->hasMany(Order::class);
+     }
   public function pharmacist()
     {
         return $this->hasOne(Pharmacist::class);
@@ -51,6 +56,16 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     {
         return $this->hasOne(Delivery::class);
     }
+
+    
+public function pharmas()
+{
+    return $this->belongsToMany(Pharma::class)
+                ->using(PharmaUser::class)
+                ->withPivot('type', 'reason')
+                ->withTimestamps();
+}
+
 
     /**
      * The attributes that should be hidden for serialization.
