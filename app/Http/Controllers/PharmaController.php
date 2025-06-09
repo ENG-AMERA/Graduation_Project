@@ -16,9 +16,9 @@ class PharmaController extends Controller
     public function __construct(PharmaService $pharmaService)
     {
         $this->pharmaService = $pharmaService;
-        
+
     }
- 
+
 
 
 

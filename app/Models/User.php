@@ -47,17 +47,24 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
      {
     return $this->hasMany(Order::class);
      }
+
+        public function cart()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+
   public function pharmacist()
     {
         return $this->hasOne(Pharmacist::class);
     }
-    
+
     public function delivery()
     {
         return $this->hasOne(Delivery::class);
     }
 
-    
+
 public function pharmas()
 {
     return $this->belongsToMany(Pharma::class)
