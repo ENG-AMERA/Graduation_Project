@@ -63,7 +63,7 @@ Route::delete('/delivary/{id}', [delivaryController::class, 'deletdelivery']);
 });
 
 Route::middleware(['auth:api', 'consumer'])->group(function () {
-Route::get('/ShowProductsOfCategory/{pharma_id}/{category_id}', [ConsumerController::class, 'ShowProductsOfCategory']);//pharma,category
+Route::get('/ShowProductsOfCategoryc/{pharma_id}/{category_id}', [ConsumerController::class, 'ShowProductsOfCategoryc']);//pharma,category
 Route::get('/Allcategories', [ConsumerController::class, 'Allcategories']);
 Route::post('/AddToCart', [ConsumerController::class, 'AddToCart']);
 Route::post('/AddOnewithoutaddtocart', [ConsumerController::class, 'AddOnewithoutaddtocart']);
@@ -75,7 +75,16 @@ Route::post('/public_order',[OrdersController::class,'Order']);
 Route::post('/OrderPrivate',[OrdersController::class,'OrderPrivate']);
 Route::post('/showQrFromDatabase', [QrCodeController::class, 'showQrFromDatabase']);
 
-Route::get('get_order_price', [OrdersController::class, 'index']);
+Route::get('get_order_price', [OrdersController::class,'index']);
+Route::get('getAllArticles', [ConsumerController::class,'getAllArticles']);
+Route::post('addlike/{id}', [ConsumerController::class,'addlike']);
+Route::post('adddislike/{id}', [ConsumerController::class,'adddislike']);
+Route::post('removelike/{id}', [ConsumerController::class,'removelike']);
+Route::post('removedislike/{id}', [ConsumerController::class,'removedislike']);
+Route::post('evaluateproduct', [ConsumerController::class,'evaluateproduct']);
+Route::post('addrecommendation', [ConsumerController::class,'addrecommendation']);
+Route::get('showRecommendationOfProduct/{id}', [ConsumerController::class,'showRecommendationOfProduct']);
+Route::post('deleteRecommendation/{id}', [ConsumerController::class,'deleteRecommendation']);
 
 Route::get('getPharmacists', [PharmaController::class, 'getPharmacists']);
 
@@ -89,24 +98,20 @@ Route::post('getAvailablePrivateOrders', [PharmaController::class, 'getAvailable
 Route::post('acceptOrder', [PharmaController::class, 'acceptOrder']);
 
 Route::post('refuseOrder', [PharmaController::class, 'refuseOrder']);
-
   Route::post('/Addproduct', [PharmacistController::class, 'Addproduct']);
   Route::get('/Allcategories', [PharmacistController::class, 'Allcategories']);
   Route::get('/ShowProductsOfCategory/{pharma_id}/{category_id}', [PharmacistController::class, 'ShowProductsOfCategory']);//pharma,category
-
-
+  Route::post('/addarticel', [PharmacistController::class, 'addarticel']);
+  Route::get('/showmyarticles', [PharmacistController::class, 'showmyarticles']);
+  Route::post('/deletearticle/{id}', [PharmacistController::class, 'deletearticle']);
+  Route::post('/edittopic', [PharmacistController::class, 'edittopic']);
+  Route::post('/editcontent', [PharmacistController::class, 'editcontent']);
 });
 
 Route::middleware(['auth:api', 'delivery'])->group(function () {
-
 Route::post('/generate-qr', [QrCodeController::class, 'generate']);
-
 Route::post('/verifyQr', [QrCodeController::class, 'verifyQr']);
-
-
 Route::post('/getPendingRequests', [delivaryController::class, 'getPendingRequests']);
-
-
 });
 
 

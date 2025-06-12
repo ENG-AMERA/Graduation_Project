@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Pharmacist extends Model
 {
     use HasFactory;
-     
+
     protected $fillable = [
         'certificate', 'description','license','user_id','pharma_id','accept'
     ];
@@ -21,6 +21,10 @@ class Pharmacist extends Model
     public function pharma()
     {
         return $this->belongsTo(Pharma::class);
+    }
+
+    public function articles(){
+        return $this->hasMany(Article::class);
     }
 }
 

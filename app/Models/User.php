@@ -73,6 +73,10 @@ public function pharmas()
                 ->withTimestamps();
 }
 
+     public function recommendation(){
+     return $this->hasMany(Recommendation::class);
+}
+
 
     /**
      * The attributes that should be hidden for serialization.

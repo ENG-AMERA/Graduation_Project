@@ -20,6 +20,7 @@ class authservice{
             'authorization' => [
                 'token' => $token,
                 'type' => 'bearer',
+                'role'=>$user->roles,
             ]];
 
         return response()->json($response, 200);

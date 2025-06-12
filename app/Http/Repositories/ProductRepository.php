@@ -6,6 +6,7 @@ use App\Models\Cart_Item;
 use App\Models\Type;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Recommendation;
 use Illuminate\Support\Facades\Auth;
 
 class ProductRepository{
@@ -268,6 +269,50 @@ return response()->json(['message' => 'product added successfully.'], 201);
    $cart->save();
 return response()->json(['message' => 'product minused successfully.'], 201);
   }
+
+  public function evaluateproduct($request){
+    $product=Product::where('id',$request->product_id)->first();
+    $product->people=$product->people + 1;
+    $product->evaluation=$product->evaluation + $request->evaluation;
+    $product->finalevaluation=$product->evaluation/$product->people;
+    $product->save();
+
+    return $product->finalevaluation;
+}
+
+public function addrecommendation($request)
+{
+$id=Auth::id();
+$recommendation=Recommendation::create([
+    'content'=>$request->content,
+    'product_id'=>$request->product_id,
+    'user_id'=>$id,
+]);
+return response()->json(['message' => 'recommendation added successfully.'], 201);
+
+}
+
+public function showRecommendationOfProduct($id){
+  $recommendation = Recommendation::with('user')
+        ->where('product_id', $id)
+        ->get();
+    return response()->json($recommendation);
+}
+
+
+public function deleteRecommendation($id){
+    $user_id=Auth::id();
+    $recommendation=Recommendation::where('id',$id)->first();
+    if($recommendation->user_id==$user_id){
+         $recommendation->delete();
+     return response()->json(['message' => 'recommendation deleted successfully.'], 201);
+
+    }
+    else{
+     return response()->json(['message' => 'forbidden.'], 201);
+    }
+
+}
 
 
 }
