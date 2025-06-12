@@ -66,6 +66,14 @@ class PharmaRepository
             ->get();
     }
 
+      
+      public function getPharmacists()
+    {
+        return Pharmacist::with(['user', 'pharma'])
+            ->where('accept',1)
+            ->get();
+    }
+
     
     public function getAvailablePublicOrders()
     {

@@ -113,6 +113,13 @@ public function createPharma(array $data)
         return $this->pharmaRepository->getPendingPharmacists();
     }
 
+    
+      public function getPharmacists()
+    {
+        return $this->pharmaRepository->getPharmacists();
+    }
+
+    
 
     
  public function getAvailablePublicOrders()

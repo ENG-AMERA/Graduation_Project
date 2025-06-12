@@ -71,6 +71,10 @@ Route::post('/showQrFromDatabase', [QrCodeController::class, 'showQrFromDatabase
 
 Route::get('get_order_price', [OrdersController::class, 'index']);
 
+Route::get('getPharmacists', [PharmaController::class, 'getPharmacists']);
+
+
+
 });
 
 Route::middleware(['auth:api', 'pharmacist'])->group(function () {

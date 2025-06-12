@@ -53,6 +53,12 @@ class PharmaController extends Controller
         $pharmacists = $this->pharmaService->getAllPending();
         return response()->json($pharmacists);
     }
+     public function getPharmacists()
+    {
+        $pharmacists = $this->pharmaService->getPharmacists();
+        return response()->json($pharmacists);
+    }
+    
 
     public function getAvailablePublicOrders()
     {
