@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\Validator;
 
 class deliveryRequest extends FormRequest
 {
@@ -26,4 +28,10 @@ class deliveryRequest extends FormRequest
            'number_method' => 'required'
         ];
     }
+        protected function failedValidation(Validator $validator): void
+{
+    throw new HttpResponseException(
+        response()->json(['errors' => $validator->errors()], 422)
+    );
+}
 }
