@@ -89,6 +89,13 @@ Route::post('deleteRecommendation/{id}', [ConsumerController::class,'deleteRecom
 Route::get('getPharmacists', [PharmaController::class, 'getPharmacists']);
 
 
+Route::post('acceptOrderc', [OrdersController::class,'acceptOrderc']);
+
+
+
+Route::post('refuseOrderc', [OrdersController::class,'refuseOrderc']);
+
+
 
 });
 
@@ -106,15 +113,16 @@ Route::post('refuseOrder', [PharmaController::class, 'refuseOrder']);
   Route::post('/deletearticle/{id}', [PharmacistController::class, 'deletearticle']);
   Route::post('/edittopic', [PharmacistController::class, 'edittopic']);
   Route::post('/editcontent', [PharmacistController::class, 'editcontent']);
+  Route::post('acceptRecommendation', [PharmaController::class, 'acceptRecommendation']);
+Route::post('refuseRecommendation', [PharmaController::class, 'refuseRecommendation']);
 });
 
 Route::middleware(['auth:api', 'delivery'])->group(function () {
 Route::post('/generate-qr', [QrCodeController::class, 'generate']);
 Route::post('/verifyQr', [QrCodeController::class, 'verifyQr']);
 Route::post('/getPendingRequests', [delivaryController::class, 'getPendingRequests']);
+
+
 });
 
 
-//show order to delivery when user and pharma accept
-//accept user on price
-//make three layer for qr

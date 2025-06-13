@@ -6,6 +6,7 @@ use App\Models\Pharma;
 use App\Models\Pharmacist;
 use App\Models\Role;
 use App\Models\PharmaUser;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 class PharmaRepository
 {
@@ -188,6 +189,45 @@ public function refuseOrder(array $data)
     ]);
 
     return response()->json(['message' => 'Order refused and delivery request created'], 200);
+}
+
+
+public function handleAccept($userId)
+{
+    $user = User::find($userId);
+
+    if (!$user) {
+        return response()->json(['message' => 'User not found'], 404);
+    }
+
+
+    // Optional: set accept_point in Pharmacist model if needed
+    $pharmacist = Pharmacist::where('id', $userId)->first();
+    if ($pharmacist) {
+        $pharmacist->update(['accept_point' => 1]);
+    }
+
+    return response()->json(['message' => 'Accepted done']);
+}
+
+
+public function handleRefuse($userId)
+{
+   $user = User::find($userId);
+
+    if (!$user) {
+        return response()->json(['message' => 'User not found'], 404);
+    }
+
+  
+
+    // Optional: set accept_point in Pharmacist model if needed
+    $pharmacist = Pharmacist::where('id', $userId)->first();
+    if ($pharmacist) {
+        $pharmacist->update(['accept_point' => 0]);
+    }
+
+    return response()->json(['message' => 'refuse done']);
 }
 
 

@@ -10,7 +10,7 @@ class Pharmacist extends Model
     use HasFactory;
 
     protected $fillable = [
-        'certificate', 'description','license','user_id','pharma_id','accept'
+        'certificate', 'description','license','user_id','pharma_id','accept','accept_point','point_value'
     ];
 
        public function user()

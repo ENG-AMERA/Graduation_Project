@@ -14,7 +14,7 @@ class PharmacistController extends Controller
        protected $productrepo;
        protected $productservice;
        protected $articlerepo;
-
+       
 
     public function __construct(ProductRepository $productrepo , productservice $productservice , ArticleRepository $articlerepo )
     {
@@ -58,6 +58,8 @@ class PharmacistController extends Controller
      public function edittopic(Request $request){
         return $this->articlerepo->edittopic($request);
     }
+
+
 
 
 

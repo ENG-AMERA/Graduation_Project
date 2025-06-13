@@ -40,7 +40,28 @@ public function acceptOrder(array $data)
    
 
     return response()->json(['message' => 'Order accepted and delivery request created'], 200);
+}public function refuseOrder(array $data)
+{
+    // Find the PharmaUser record by order_id
+    $pharmaUser = PharmaUser::where('order_id', $data['order_id'])->first();
+
+    if (!$pharmaUser) {
+        return response()->json(['message' => 'PharmaUser not found'], 404);
+    }
+
+    // Delete the PharmaUser record
+    $pharmaUser->delete();
+
+    // Optionally delete from orders table too
+    $order = Order::find($data['order_id']);
+    if ($order) {
+        $order->delete();
+    }
+
+    return response()->json(['message' => 'PharmaUser and order deleted successfully.']);
 }
+
+
 
 
  public function getAcceptedOrdersWithPrice()

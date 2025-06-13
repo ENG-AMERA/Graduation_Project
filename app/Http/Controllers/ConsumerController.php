@@ -6,6 +6,7 @@ use App\Http\Repositories\ArticleRepository;
 use Illuminate\Http\Request;
 use App\Http\Services\productservice;
 use App\Http\Repositories\ProductRepository;
+use App\Http\Requests\AddRecommendationRequest;
 
 class ConsumerController extends Controller
 {
@@ -71,9 +72,10 @@ class ConsumerController extends Controller
         return $this->productrepo->evaluateproduct($request);
     }
 
-    public function addrecommendation(Request $request){
-        return $this->productrepo->addrecommendation($request);
-    }
+   public function addrecommendation(AddRecommendationRequest $request)
+{
+    return $this->productrepo->addrecommendation($request->validated());
+}
 
      public function showRecommendationOfProduct($product_id)
      {

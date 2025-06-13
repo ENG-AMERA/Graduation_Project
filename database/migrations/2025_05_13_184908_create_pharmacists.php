@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('accept')->nullable();
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->foreignId('pharma_id')->constrained('pharmas')->onDelete('cascade');
+            $table->integer('point_value')->default(100); // 1 point = 100 SY
+            $table->boolean('accept_point')->default(0);
             $table->timestamps();
         });
     }
@@ -28,5 +30,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('pharmacists');
+      
+    Schema::table('pharmacists', function (Blueprint $table) {
+        $table->dropColumn('accept_point');
+    });
     }
 };

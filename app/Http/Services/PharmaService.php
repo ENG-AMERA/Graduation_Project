@@ -146,6 +146,16 @@ public function refuseOrder(array $data)
 }
 
 
+public function acceptRecommendation($userId)
+{
+    return $this->pharmaRepository->handleAccept($userId);
+}
+
+public function refuseRecommendation($userId)
+{
+    return $this->pharmaRepository->handleRefuse($userId);
+}
+
 
 
 }

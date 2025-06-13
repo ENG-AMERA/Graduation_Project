@@ -8,7 +8,7 @@ use App\Http\Services\PharmaService;
 use App\Http\Requests\AcceptPharmacistRequest;
 use App\Http\Requests\AcceptOrder;
 use App\Http\Requests\Refuseorder;
-
+use Illuminate\Http\Request;
 class PharmaController extends Controller
 {
     protected $pharmaService;
@@ -86,5 +86,14 @@ public function refuseOrder(Refuseorder $request)
     return $this->pharmaService->refuseOrder($request->validated());
 }
 
+public function acceptRecommendation()
+{
+    return $this->pharmaService->acceptRecommendation(auth()->id());
+}
+
+public function refuseRecommendation()
+{
+    return $this->pharmaService->refuseRecommendation(auth()->id());
+}
 
 }

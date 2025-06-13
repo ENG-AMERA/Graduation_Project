@@ -96,6 +96,12 @@ public function privateOrder(array $data, $user)
     return $this->orderRepo->acceptOrder($data);
 }
 
+    public function refuseOrder(array $data)
+{
+    return $this->orderRepo->refuseOrder($data);
+}
+
+
 
     public function getAcceptedOrders()
     {

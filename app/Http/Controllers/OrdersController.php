@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AcceptOrder;
+use App\Http\Requests\AcceptOrderRequest;
 use Illuminate\Http\Request;
 use App\Http\Requests\makeorder;
 use App\Http\Services\orderService;
@@ -34,7 +35,7 @@ class OrdersController extends Controller
     {
         $user = Auth::user();
 
-        $order = $this->service->publicOrder($request->validated(), $user);
+        $order = $this->service->privateOrder($request->validated(), $user);
 
         return response()->json([
             'message' => 'Order created successfully.',
@@ -46,15 +47,24 @@ class OrdersController extends Controller
 
     
     
-    public function acceptOrderc(AcceptOrder $request )
+public function acceptOrderc(AcceptOrderRequest $request)
 {
     return $this->service->acceptOrder($request->validated());
 }
 
-  public function index()
+    
+public function refuseOrderc(AcceptOrderRequest $request)
+{
+    return $this->service->refuseOrder($request->validated());
+}
+
+public function index()
     {
         $data = $this->service->getAcceptedOrders();
         return response()->json($data);
     }
+
+
+
 
 }

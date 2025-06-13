@@ -6,7 +6,9 @@ use App\Models\Cart_Item;
 use App\Models\Type;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Pharmacist;
 use App\Models\Recommendation;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class ProductRepository{
@@ -280,16 +282,32 @@ return response()->json(['message' => 'product minused successfully.'], 201);
     return $product->finalevaluation;
 }
 
-public function addrecommendation($request)
+public function addrecommendation(array $data)
 {
-$id=Auth::id();
-$recommendation=Recommendation::create([
-    'content'=>$request->content,
-    'product_id'=>$request->product_id,
-    'user_id'=>$id,
-]);
-return response()->json(['message' => 'recommendation added successfully.'], 201);
+    $id = Auth::id();
 
+    $recommendation = Recommendation::create([
+        'content'     => $data['content'],
+        'product_id'  => $data['product_id'],
+        'user_id'     => $id,
+    ]);
+
+    if ($recommendation) {
+        $pharmacist = Pharmacist::find($data['pharmacist_id']);
+
+        if (!$pharmacist) {
+            return response()->json(['message' => 'Pharmacist not found'], 404);
+        }
+
+        if ($pharmacist->accept_point == 1) {
+            // Add 5 points to the authenticated user
+            $user = User::find($id);
+            $user->points += 5;
+            $user->save();
+        }
+    }
+
+    return response()->json(['message' => 'Recommendation added successfully. and point added to user'], 201);
 }
 
 public function showRecommendationOfProduct($id){
