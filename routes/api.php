@@ -96,6 +96,8 @@ Route::post('acceptOrderc', [OrdersController::class,'acceptOrderc']);
 Route::post('refuseOrderc', [OrdersController::class,'refuseOrderc']);
 
 
+Route::post('/getConsumerPendingRequests', [delivaryController::class, 'getConsumerPendingRequests']);
+
 
 });
 
@@ -121,7 +123,6 @@ Route::middleware(['auth:api', 'delivery'])->group(function () {
 Route::post('/generate-qr', [QrCodeController::class, 'generate']);
 Route::post('/verifyQr', [QrCodeController::class, 'verifyQr']);
 Route::post('/getPendingRequests', [delivaryController::class, 'getPendingRequests']);
-
 
 });
 

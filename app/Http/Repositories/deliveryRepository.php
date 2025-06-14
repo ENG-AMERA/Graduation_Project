@@ -61,23 +61,56 @@ class deliveryRepository
             ->whereNull('accept')
             ->get();
     }
-
-    public function getPendingRequestsWithPharmaAndOrder()
-    {
-        return DB::table('delivery_requests')
-            ->join('pharma_users', 'delivery_requests.pharma_user_id', '=', 'pharma_users.id')
-            ->join('orders', 'pharma_users.order_id', '=', 'orders.id')
-            ->join('pharmas', 'pharma_users.pharma_id', '=', 'pharmas.id')
-            ->where('delivery_requests.done', null)
-            ->where('pharma_users.accept_user','=',1)
-             ->where('pharma_users.accept_pharma','=',1)
-            ->select(
-                'pharmas.name as pharma_name',
-                'orders.type as order_type',
-                'orders.time as order_time',
-                'delivery_requests.price'
-            )
-            ->get();
-    }
     
+public function getPendingRequestsWithPharmaAndOrder()
+{
+    return DB::table('delivery_requests')
+        ->join('pharma_users', 'delivery_requests.pharma_user_id', '=', 'pharma_users.id')
+        ->join('orders', 'pharma_users.order_id', '=', 'orders.id')
+        ->join('pharmas', 'pharma_users.pharma_id', '=', 'pharmas.id')
+        ->join('users', 'pharma_users.user_id', '=', 'users.id')
+        ->whereNull('delivery_requests.done')
+        ->where('pharma_users.accept_user', '=', 1)
+        ->where('pharma_users.accept_pharma', '=', 1)
+        ->whereDate('orders.time', now()->toDateString()) // only today's orders
+        ->select(
+            'orders.id as order_id',
+            'orders.length as order_length',
+            'orders.width as order_width',
+            'orders.type as order_type',
+            'orders.time as order_time',
+            'delivery_requests.price',
+            'pharmas.name as pharma_name',
+            'pharmas.length as pharma_length',
+            'pharmas.width as pharma_width',
+            'users.firstname',
+            'users.lastname',
+            'users.phone',
+            'users.location'
+        )
+        ->get();
+}
+
+
+
+public function getConsumerPendingRequests()
+{
+    return DB::table('delivery_requests')
+        ->join('pharma_users', 'delivery_requests.pharma_user_id', '=', 'pharma_users.id')
+        ->join('orders', 'pharma_users.order_id', '=', 'orders.id')
+        ->join('pharmas', 'pharma_users.pharma_id', '=', 'pharmas.id')
+        ->whereNull('delivery_requests.done')
+        ->where('pharma_users.accept_user', 1)
+        ->where('pharma_users.accept_pharma', 1)
+        ->whereDate('orders.time', now()->toDateString()) // only today's orders
+        ->select(
+            'orders.id as order_id',
+            'orders.type as order_type',
+            'delivery_requests.price',
+            'delivery_requests.qr',
+            'pharmas.name as pharma_name'
+        )
+        ->get();
+}
+
 }

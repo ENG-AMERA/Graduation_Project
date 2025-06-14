@@ -40,7 +40,9 @@ public function acceptOrder(array $data)
    
 
     return response()->json(['message' => 'Order accepted and delivery request created'], 200);
-}public function refuseOrder(array $data)
+}
+
+public function refuseOrder(array $data)
 {
     // Find the PharmaUser record by order_id
     $pharmaUser = PharmaUser::where('order_id', $data['order_id'])->first();
@@ -62,7 +64,7 @@ public function acceptOrder(array $data)
 }
 
 
-
+/*
 
  public function getAcceptedOrdersWithPrice()
     {
@@ -82,7 +84,27 @@ public function acceptOrder(array $data)
                 'delivery_requests.price'
             )
             ->get();
-    }
+    }*/
+public function getAcceptedOrdersWithPrice()
+{
+    return DB::table('pharma_users')
+        ->join('orders', 'pharma_users.order_id', '=', 'orders.id')
+        ->leftJoin('delivery_requests', 'pharma_users.id', '=', 'delivery_requests.pharma_user_id')
+        ->join('pharmas', 'pharma_users.pharma_id', '=', 'pharmas.id') // join pharmas
+        ->where('pharma_users.accept_pharma', 1)
+        ->select(
+            'pharmas.name as pharma_name', // get pharma name
+            'orders.id as order_id',
+            'orders.name_medicine',
+            'orders.photo',
+            'orders.length',
+            'orders.width',
+            'orders.type',
+            'orders.time',
+            'delivery_requests.price'
+        )
+        ->get();
+}
 
 
 }

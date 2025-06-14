@@ -57,4 +57,13 @@ class delivaryController extends Controller
         return response()->json($data);
     }
 
+    
+     public function getConsumerPendingRequests()
+    {
+        $data = $this->deliveryService->getConsumerPendingRequests();
+        return response()->json($data);
+    }
+
+    
+
 }

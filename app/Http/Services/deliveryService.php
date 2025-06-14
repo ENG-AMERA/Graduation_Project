@@ -62,4 +62,11 @@ class deliveryService
     {
         return $this->deliveryRepository->getPendingRequestsWithPharmaAndOrder();
     }
+     
+    public function getConsumerPendingRequests()
+    {
+        return $this->deliveryRepository->getConsumerPendingRequests();
+    }
+
+    
 }
