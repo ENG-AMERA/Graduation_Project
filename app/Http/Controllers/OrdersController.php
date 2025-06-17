@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AcceptOrder;
 use App\Http\Requests\AcceptOrderRequest;
+use App\Http\Requests\ApplyPointDiscountRequest;
 use Illuminate\Http\Request;
 use App\Http\Requests\makeorder;
 use App\Http\Services\orderService;
@@ -64,7 +65,8 @@ public function index()
         return response()->json($data);
     }
 
-
-
-
+public function applyPointDiscount(ApplyPointDiscountRequest $request)
+{
+    return $this->service->applyPointDiscount($request);
+}
 }

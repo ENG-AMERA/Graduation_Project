@@ -24,7 +24,7 @@ class delivaryController extends Controller
         $result = $this->deliveryService->createdelivery($request->validated());
 
         return response()->json([
-            'message' => 'Pharma and Pharmacist created successfully.',
+            'message' => 'delivery created successfully.',
             'data' => $result,
         ], 201);
     }

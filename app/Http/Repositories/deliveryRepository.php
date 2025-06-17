@@ -3,9 +3,10 @@ namespace App\Http\Repositories;
 
 use App\Models\Delivery;
 use App\Models\Role;
-
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 class deliveryRepository
 {
     public function createdelivery(array $data)
@@ -64,31 +65,42 @@ class deliveryRepository
     
 public function getPendingRequestsWithPharmaAndOrder()
 {
-    return DB::table('delivery_requests')
-        ->join('pharma_users', 'delivery_requests.pharma_user_id', '=', 'pharma_users.id')
-        ->join('orders', 'pharma_users.order_id', '=', 'orders.id')
-        ->join('pharmas', 'pharma_users.pharma_id', '=', 'pharmas.id')
-        ->join('users', 'pharma_users.user_id', '=', 'users.id')
-        ->whereNull('delivery_requests.done')
-        ->where('pharma_users.accept_user', '=', 1)
-        ->where('pharma_users.accept_pharma', '=', 1)
-        ->whereDate('orders.time', now()->toDateString()) // only today's orders
-        ->select(
-            'orders.id as order_id',
-            'orders.length as order_length',
-            'orders.width as order_width',
-            'orders.type as order_type',
-            'orders.time as order_time',
-            'delivery_requests.price',
-            'pharmas.name as pharma_name',
-            'pharmas.length as pharma_length',
-            'pharmas.width as pharma_width',
-            'users.firstname',
-            'users.lastname',
-            'users.phone',
-            'users.location'
-        )
-        ->get();
+
+$date = Carbon::now('Asia/Damascus')->toDateString();
+$nextDay = Carbon::parse($date, 'Asia/Damascus')->addDay()->toDateString();
+
+return DB::table('delivery_requests')
+    ->join('pharma_users', 'delivery_requests.pharma_user_id', '=', 'pharma_users.id')
+    ->join('orders', 'pharma_users.order_id', '=', 'orders.id')
+    ->join('pharmas', 'pharma_users.pharma_id', '=', 'pharmas.id')
+    ->join('users', 'pharma_users.user_id', '=', 'users.id')
+    ->whereNull('delivery_requests.done')
+    ->whereNull('delivery_requests.delivery_id')
+    ->where('pharma_users.accept_user', '=', 1)
+    ->where('pharma_users.accept_pharma', '=', 1)
+    ->where(function($query) use ($date, $nextDay) {
+        $query->whereNull('orders.time')
+              ->orWhere(function($q) use ($date, $nextDay) {
+                  $q->where('orders.time', '>=', $date . ' 00:00:00')
+                    ->where('orders.time', '<', $nextDay . ' 00:00:00');
+              });
+    })
+    ->select(
+        'orders.id as order_id',
+        'orders.length as order_length',
+        'orders.width as order_width',
+        'orders.type as order_type',
+        'orders.time as order_time',
+        'delivery_requests.price',
+        'pharmas.name as pharma_name',
+        'pharmas.length as pharma_length',
+        'pharmas.width as pharma_width',
+        'users.firstname',
+        'users.lastname',
+        'users.phone',
+        'users.location'
+    )
+    ->get();
 }
 
 
@@ -102,15 +114,16 @@ public function getConsumerPendingRequests()
         ->whereNull('delivery_requests.done')
         ->where('pharma_users.accept_user', 1)
         ->where('pharma_users.accept_pharma', 1)
-        ->whereDate('orders.time', now()->toDateString()) // only today's orders
+        
         ->select(
             'orders.id as order_id',
             'orders.type as order_type',
             'delivery_requests.price',
-            'delivery_requests.qr',
+           
             'pharmas.name as pharma_name'
         )
         ->get();
 }
+
 
 }

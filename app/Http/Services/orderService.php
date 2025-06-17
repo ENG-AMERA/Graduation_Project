@@ -2,6 +2,8 @@
 namespace App\Http\Services;
 use Carbon\Carbon;
 use App\Http\Repositories\OrderRepository;
+use App\Http\Requests\ApplyPointDiscountRequest;
+use Illuminate\Support\Facades\Auth;
 
 class OrderService
 {
@@ -107,5 +109,59 @@ public function privateOrder(array $data, $user)
     {
         return $this->orderRepo->getAcceptedOrdersWithPrice();
     }
+  
+  
+    public function applyPointDiscount(ApplyPointDiscountRequest $request)
+{
+    /** @var \App\Models\User $user */
+    $user = Auth::user();
 
+    if (!$user) {
+        return response()->json(['error' => 'Unauthenticated.'], 401);
+    }
+
+    $orderId = $request->input('order_id');
+    $pointsUsed = $request->input('points_used');
+
+    $pharmaUser = $this->orderRepo->getPharmaUser($orderId, $user->id);
+
+    if (!$pharmaUser) {
+        return response()->json(['error' => 'No valid pharma_user found for this order.'], 404);
+    }
+
+    $deliveryRequest = $this->orderRepo->getDeliveryRequest($pharmaUser->id);
+
+    if (!$deliveryRequest) {
+        return response()->json(['error' => 'No delivery request found for this order.'], 404);
+    }
+
+    $pharmacist = $this->orderRepo->getPharmacist($pharmaUser->pharma_id);
+
+    if (!$pharmacist || $pharmacist->accept_point != 1) {
+        return response()->json(['error' => 'This pharmacist does not accept points.'], 403);
+    }
+
+    if ($user->points < $pointsUsed) {
+        return response()->json(['error' => 'Not enough points.'], 400);
+    }
+
+    $discount = $pharmacist->point_value * $pointsUsed;
+    $originalPrice = $deliveryRequest->price;
+    $newPrice = max($originalPrice - $discount, 0);
+
+    $deliveryRequest->price = $newPrice;
+    $deliveryRequest->save();
+
+    $user->points -= $pointsUsed;
+    $user->save();
+
+    return response()->json([
+        'message' => 'Discount applied successfully',
+        'order_id' => $orderId,
+        'original_price' => $originalPrice,
+        'discount' => $discount,
+        'new_price' => $newPrice,
+        'remaining_points' => $user->points
+    ]);
+}
 }

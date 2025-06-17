@@ -91,6 +91,7 @@ public function acceptRecommendation()
     return $this->pharmaService->acceptRecommendation(auth()->id());
 }
 
+
 public function refuseRecommendation()
 {
     return $this->pharmaService->refuseRecommendation(auth()->id());

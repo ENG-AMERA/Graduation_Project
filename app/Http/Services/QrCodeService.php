@@ -41,7 +41,7 @@ class QrCodeService
         }
 
         $qrSvg = QrCode::format('svg')->size(300)->generate($deliveryRequest->qr);
-        return response($qrSvg)->header('Content-Type', 'image/svg+xml');
+        return response()->json([ 'delivery accept '], 200);
     }
 
     public function showQr($orderId)

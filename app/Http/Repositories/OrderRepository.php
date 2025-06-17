@@ -4,16 +4,18 @@ namespace App\Http\Repositories;
 use App\Models\DeliveryRequest;
 use App\Models\PharmaUser;
 use App\Models\Order;
+use App\Models\Pharmacist;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class OrderRepository
 {
-    public function createPharma(array $data): PharmaUser
+    public function createPharma(array $data)
     {
         return PharmaUser::create($data);
     }
 
-    public function createOrder(array $data): Order
+    public function createOrder(array $data)
     {
         return Order::create($data);
     }
@@ -87,13 +89,14 @@ public function refuseOrder(array $data)
     }*/
 public function getAcceptedOrdersWithPrice()
 {
-    return DB::table('pharma_users')
+    $orders = DB::table('pharma_users')
         ->join('orders', 'pharma_users.order_id', '=', 'orders.id')
         ->leftJoin('delivery_requests', 'pharma_users.id', '=', 'delivery_requests.pharma_user_id')
-        ->join('pharmas', 'pharma_users.pharma_id', '=', 'pharmas.id') // join pharmas
+        ->join('pharmas', 'pharma_users.pharma_id', '=', 'pharmas.id')
         ->where('pharma_users.accept_pharma', 1)
+        ->whereNull('pharma_users.accept_user')
         ->select(
-            'pharmas.name as pharma_name', // get pharma name
+            'pharmas.name as pharma_name',
             'orders.id as order_id',
             'orders.name_medicine',
             'orders.photo',
@@ -104,7 +107,50 @@ public function getAcceptedOrdersWithPrice()
             'delivery_requests.price'
         )
         ->get();
+
+    // Append photo_path to each item
+    $orders->transform(function ($order) {
+        if ($order->photo) {
+            if (filter_var($order->photo, FILTER_VALIDATE_URL)) {
+                $parsed = parse_url($order->photo);
+                $order->photo_path = ltrim($parsed['path'], '/');
+            } else {
+                $order->photo_path = $order->photo;
+            }
+        } else {
+            $order->photo_path = null;
+        }
+        return $order;
+    });
+
+    return $orders;
 }
+
+
+
+////
+    public function getPharmaUser($orderId, $userId)
+    {
+        return PharmaUser::where('order_id', $orderId)
+            ->where('user_id', $userId)
+            ->where('accept_pharma', 1)
+            ->where('accept_user', 1)
+            ->first();
+    }
+
+    public function getDeliveryRequest($pharmaUserId)
+    {
+        return DeliveryRequest::where('pharma_user_id', $pharmaUserId)->first();
+    }
+
+    public function getPharmacist($pharmaId)
+    {
+        return Pharmacist::where('pharma_id', $pharmaId)
+            ->where('accept', 1)
+            ->first();
+    }
+
+
 
 
 }

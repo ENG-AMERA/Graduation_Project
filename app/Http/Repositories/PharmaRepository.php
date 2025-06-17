@@ -78,14 +78,90 @@ class PharmaRepository
     
     public function getAvailablePublicOrders()
     {
-        return PharmaUser::with('order')
-            ->where('type', 0)
-            ->where('accept_pharma',null)
-            ->whereNull('pharma_id')
-            ->get();
+      
+    $user = Auth::user();
+
+    $pharmacist = Pharmacist::where('user_id', $user->id)->first();
+
+    if (!$pharmacist) {
+        throw new \Exception('Pharmacist not found for this user.');
     }
 
-    
+    $pharmaId = $pharmacist->pharma_id;
+
+    $orders = PharmaUser::with(['order' => function ($query) {
+        $query->select('id', 'photo');
+    }])
+    ->where('type', 0)
+    ->whereNull('accept_pharma')
+    ->where('pharma_id', $pharmaId)
+    ->get();
+
+    $orders->each(function ($pharmaUser) {
+        if ($pharmaUser->order) {
+            $photo = $pharmaUser->order->photo;
+
+            if ($photo) {
+                // Check if photo is a full URL
+                if (filter_var($photo, FILTER_VALIDATE_URL)) {
+                    $parsedUrl = parse_url($photo);
+                    $relativePath = ltrim($parsedUrl['path'], '/'); // remove leading slash
+                } else {
+                    $relativePath = $photo; // already relative or just filename
+                }
+                $pharmaUser->order->photo_path = $relativePath;
+            } else {
+                $pharmaUser->order->photo_path = null;
+            }
+        }
+    });
+
+    return $orders;
+    }
+public function getAvailablePrivateOrders()
+{
+    $user = Auth::user();
+
+    $pharmacist = Pharmacist::where('user_id', $user->id)->first();
+
+    if (!$pharmacist) {
+        throw new \Exception('Pharmacist not found for this user.');
+    }
+
+    $pharmaId = $pharmacist->pharma_id;
+
+    $orders = PharmaUser::with(['order' => function ($query) {
+        $query->select('id', 'photo');
+    }])
+    ->where('type', 1)
+    ->whereNull('accept_pharma')
+    ->where('pharma_id', $pharmaId)
+    ->get();
+
+    $orders->each(function ($pharmaUser) {
+        if ($pharmaUser->order) {
+            $photo = $pharmaUser->order->photo;
+
+            if ($photo) {
+                // Check if photo is a full URL
+                if (filter_var($photo, FILTER_VALIDATE_URL)) {
+                    $parsedUrl = parse_url($photo);
+                    $relativePath = ltrim($parsedUrl['path'], '/'); // remove leading slash
+                } else {
+                    $relativePath = $photo; // already relative or just filename
+                }
+                $pharmaUser->order->photo_path = $relativePath;
+            } else {
+                $pharmaUser->order->photo_path = null;
+            }
+        }
+    });
+
+    return $orders;
+}
+
+    /*
+
 public function getAvailablePrivateOrders()
 {
     $user = Auth::user();
@@ -106,6 +182,7 @@ public function getAvailablePrivateOrders()
         ->where('pharma_id', $pharmaId)
         ->get();
 }
+*/
 
 public function acceptOrder(array $data)
 {
