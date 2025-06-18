@@ -78,6 +78,11 @@ public function pharmas()
      return $this->hasMany(Recommendation::class);
 }
 
+     public function CartOrder(){
+     return $this->hasMany(CartOrder::class);
+}
+
+
 
     /**
      * The attributes that should be hidden for serialization.

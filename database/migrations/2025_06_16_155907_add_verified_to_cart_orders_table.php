@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->enum('type', ['Skin Care','Body Care','Perfume' ,'Hair Mist','Herbs','Others']);
-
-            $table->timestamps();
+        Schema::table('cart_orders', function (Blueprint $table) {
+            $table->boolean('verified')->default('0');
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::table('cart_orders', function (Blueprint $table) {
+            $table->boolean('verified')->default('0');
+        });
     }
 };

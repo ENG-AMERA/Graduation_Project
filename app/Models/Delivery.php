@@ -24,4 +24,8 @@ class Delivery extends Model
     return $this->hasMany(DeliveryRequest::class);
    }
 
+      public function applycartorder(){
+        return $this->hasMany(ApplyCartOrder::class);
+    }
+
 }

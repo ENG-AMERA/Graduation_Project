@@ -36,4 +36,12 @@ public function pharmaUsers()
         return $this->hasMany(Product::class);
      }
 
+        public function cart(){
+        return $this->hasMany(Cart::class);
+     }
+
+           public function cartorder(){
+        return $this->hasMany(CartOrder::class);
+     }
+
 }

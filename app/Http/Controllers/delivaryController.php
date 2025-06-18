@@ -4,20 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\deliveryRequest;
-use App\Http\Requests\AcceptDeliveryRequest;
 use App\Http\Services\deliveryService;
+use App\Http\Requests\AcceptDeliveryRequest;
+use App\Http\Repositories\CartOrdersRepository;
+
 class delivaryController extends Controller
 {
     protected $deliveryService;
+    protected $cartorderrepo;
 
-    public function __construct(deliveryService $deliveryService)
+    public function __construct(deliveryService $deliveryService , CartOrdersRepository $cartorderrepo)
     {
         $this->deliveryService = $deliveryService;
-        
+        $this->cartorderrepo = $cartorderrepo;
+
     }
- 
-
-
 
     public function delivery_request(deliveryRequest $request)
     {
@@ -57,13 +58,19 @@ class delivaryController extends Controller
         return response()->json($data);
     }
 
-    
-     public function getConsumerPendingRequests()
-    {
-        $data = $this->deliveryService->getConsumerPendingRequests();
-        return response()->json($data);
+    public function getcartordertodelivery(){
+        return $this->cartorderrepo->getcartordertodelivery();
+
     }
 
-    
+    public function applycartorder($cartorder_id){
+        return $this->cartorderrepo->generateQr($cartorder_id);
+    }
+
+       public function verifyqrforcartorder(Request $request){
+        return $this->cartorderrepo->verifyQr($request);
+    }
+
+
 
 }

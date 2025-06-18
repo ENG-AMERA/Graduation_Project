@@ -2,25 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Repositories\ArticleRepository;
 use Illuminate\Http\Request;
 use App\Http\Requests\TypeRequest;
 use App\Http\Requests\ProductRequest;
-use App\Http\Repositories\ProductRepository;
 use App\Http\Services\productservice;
+use App\Http\Repositories\ArticleRepository;
+use App\Http\Repositories\ProductRepository;
+use App\Http\Repositories\CartOrdersRepository;
 
 class PharmacistController extends Controller
 {
        protected $productrepo;
        protected $productservice;
        protected $articlerepo;
-       
+       protected $cartorderrepo;
 
-    public function __construct(ProductRepository $productrepo , productservice $productservice , ArticleRepository $articlerepo )
+    public function __construct(ProductRepository $productrepo , productservice $productservice ,
+     ArticleRepository $articlerepo , CartOrdersRepository $cartorderrepo)
     {
         $this->productrepo = $productrepo;
          $this->productservice = $productservice;
          $this->articlerepo = $articlerepo;
+         $this->cartorderrepo = $cartorderrepo;
 
     }
     public function Addproduct(ProductRequest $request)
@@ -57,6 +60,22 @@ class PharmacistController extends Controller
 
      public function edittopic(Request $request){
         return $this->articlerepo->edittopic($request);
+    }
+
+     public function getallcartorderforpharmacist($pharma_id)
+     {
+        return $this->cartorderrepo->getallcartorderforpharmacist($pharma_id);
+    }
+      public function acceptcartorder($cartorder_id)
+     {
+        return $this->cartorderrepo->acceptcartorder($cartorder_id);
+    }
+
+     Public function editproduct(Request $request){
+        return $this->productrepo->editquantityofproduct($request);
+    }
+     Public function edittype(Request $request){
+        return $this->productrepo->editquantityoftype($request);
     }
 
 

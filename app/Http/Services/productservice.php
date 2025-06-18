@@ -57,7 +57,7 @@ class productservice{
         }
         if(!$cart)
         {
-            $cart=$this->ProductRepository->createcart($user_id);
+            $cart=$this->ProductRepository->createcart($user_id,$request->pharma_id);
             $this->ProductRepository->addnewtype($request,$cart);
 
         }
@@ -92,7 +92,7 @@ class productservice{
 
          if(!$cart)
         {
-           $cart=$this->ProductRepository->createcart($user_id);
+           $cart=$this->ProductRepository->createcart($user_id,$request->pharma_id);
             $this->ProductRepository->addnewproduct($request,$cart);
 
         }

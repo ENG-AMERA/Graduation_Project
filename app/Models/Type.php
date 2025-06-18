@@ -21,5 +21,10 @@ class Type extends Model
      {
         return $this->hasMany(Cart_Item::class);
      }
+
+        public function cartorderitem()
+     {
+        return $this->hasMany(CartOrderItem::class);
+     }
 }
 

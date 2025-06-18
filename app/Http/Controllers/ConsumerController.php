@@ -2,23 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Repositories\ArticleRepository;
 use Illuminate\Http\Request;
 use App\Http\Services\productservice;
+use App\Http\Repositories\ArticleRepository;
 use App\Http\Repositories\ProductRepository;
 use App\Http\Requests\AddRecommendationRequest;
+use App\Http\Requests\ConfirmCartOrderRequest;
+use App\Http\Repositories\CartOrdersRepository;
+
 
 class ConsumerController extends Controller
 {
     protected $productrepo;
     protected $productservice;
     protected $articlerepo;
+    protected $cartorderrepo;
 
-    public function __construct(ProductRepository $productrepo ,productservice $productservice ,ArticleRepository $articlerepo)
+    public function __construct(ProductRepository $productrepo ,productservice $productservice ,
+    ArticleRepository $articlerepo , CartOrdersRepository $cartorderrepo)
     {
         $this->productrepo = $productrepo;
         $this->productservice = $productservice;
         $this->articlerepo = $articlerepo;
+         $this->cartorderrepo = $cartorderrepo;
 
     }
     public function ShowProductsOfCategoryc($pharmaid,$categoryid){
@@ -85,6 +91,17 @@ class ConsumerController extends Controller
      {
         return $this->productrepo->deleteRecommendation($recommendation_id);
     }
+
+     public function confirmcartorder(ConfirmCartOrderRequest $request)
+     {
+        return $this->cartorderrepo->confirmorder($request);
+    }
+
+    public function show_qr_ofcartorderwithdetail($cartorder_id){
+        return $this->cartorderrepo->show_qr_ofcartorderwithdetail($cartorder_id);
+    }
+
+
 
 
 }

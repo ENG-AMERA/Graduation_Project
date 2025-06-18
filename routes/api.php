@@ -85,7 +85,8 @@ Route::post('evaluateproduct', [ConsumerController::class,'evaluateproduct']);
 Route::post('addrecommendation', [ConsumerController::class,'addrecommendation']);
 Route::get('showRecommendationOfProduct/{id}', [ConsumerController::class,'showRecommendationOfProduct']);
 Route::post('deleteRecommendation/{id}', [ConsumerController::class,'deleteRecommendation']);
-
+Route::post('confirmcartorder', [ConsumerController::class,'confirmcartorder']);
+Route::get('show_qr_ofcartorderwithdetail/{id}', [ConsumerController::class,'show_qr_ofcartorderwithdetail']);
 Route::get('getPharmacists', [PharmaController::class, 'getPharmacists']);
 
 
@@ -115,15 +116,25 @@ Route::post('refuseOrder', [PharmaController::class, 'refuseOrder']);
   Route::post('/deletearticle/{id}', [PharmacistController::class, 'deletearticle']);
   Route::post('/edittopic', [PharmacistController::class, 'edittopic']);
   Route::post('/editcontent', [PharmacistController::class, 'editcontent']);
+
   Route::post('acceptRecommendation', [PharmaController::class, 'acceptRecommendation']);
 Route::post('refuseRecommendation', [PharmaController::class, 'refuseRecommendation']);
+
+  Route::get('/getallcartorderforpharmacist/{id}', [PharmacistController::class, 'getallcartorderforpharmacist']);
+  Route::post('/acceptcartorder/{id}', [PharmacistController::class, 'acceptcartorder']);
+  Route::post('/editproduct', [PharmacistController::class, 'editproduct']);
+  Route::post('/edittype', [PharmacistController::class, 'edittype']);
+
+
 });
 
 Route::middleware(['auth:api', 'delivery'])->group(function () {
 Route::post('/generate-qr', [QrCodeController::class, 'generate']);
 Route::post('/verifyQr', [QrCodeController::class, 'verifyQr']);
 Route::post('/getPendingRequests', [delivaryController::class, 'getPendingRequests']);
-
+Route::get('/getcartordertodelivery', [delivaryController::class, 'getcartordertodelivery']);
+Route::post('/applycartorder/{id}', [delivaryController::class, 'applycartorder']);
+Route::post('/verifyqrforcartorder', [delivaryController::class, 'verifyqrforcartorder']);
 
 });
 

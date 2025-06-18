@@ -155,9 +155,10 @@ public function ShowProductsOfCategory($pharmaid,$categoryid)
   }
 
 
-  public function createcart($user_id){
+  public function createcart($user_id,$pharma_id){
         $cart=Cart::create([
         'user_id'=>$user_id,
+        'pharma_id'=>$pharma_id,
         'totalprice'=>'0'
     ]);
     return $cart;
@@ -330,6 +331,18 @@ public function deleteRecommendation($id){
      return response()->json(['message' => 'forbidden.'], 201);
     }
 
+}
+
+public function editquantityofproduct($request){
+    $product=Product::where('id',$request->product_id)->first();
+    $product->quantity=$request->quantity;
+    $product->save();
+}
+
+ public function editquantityoftype($request){
+    $type=Type::where('id',$request->type_id)->first();
+    $type->quantity=$request->quantity;
+    $type->save();
 }
 
 

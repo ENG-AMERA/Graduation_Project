@@ -10,7 +10,7 @@ class Cart extends Model
     use HasFactory;
 
          protected $fillable=[
-        'user_id','totalprice'
+        'user_id','totalprice','pharma_id'
     ];
 
 
@@ -21,6 +21,10 @@ class Cart extends Model
          public function user()
     {
         return $this->belongsTo(User::class);
+    }
+             public function pharma()
+    {
+        return $this->belongsTo(Pharma::class);
     }
 }
 
