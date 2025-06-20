@@ -64,7 +64,7 @@ Route::delete('/delivary/{id}', [delivaryController::class, 'deletdelivery']);
 
 Route::middleware(['auth:api', 'consumer'])->group(function () {
 Route::get('/ShowProductsOfCategoryc/{pharma_id}/{category_id}', [ConsumerController::class, 'ShowProductsOfCategoryc']);//pharma,category
-Route::get('/Allcategories', [ConsumerController::class, 'Allcategories']);
+Route::get('/Allcategoriesc', [ConsumerController::class, 'Allcategoriesc']);
 Route::post('/AddToCart', [ConsumerController::class, 'AddToCart']);
 Route::post('/AddOnewithoutaddtocart', [ConsumerController::class, 'AddOnewithoutaddtocart']);
 Route::post('/MinusOnewithoutaddtocart', [ConsumerController::class, 'MinusOnewithoutaddtocart']);

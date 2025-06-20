@@ -86,7 +86,7 @@ public function Allcategories(){
 
 public function ShowProductsOfCategory($pharmaid,$categoryid)
 {
-    $products = Product::where('pharma_id', $pharmaid)
+        $products = Product::where('pharma_id', $pharmaid)
                 ->where('category_id', $categoryid)
                 ->with('types')
                 ->get();

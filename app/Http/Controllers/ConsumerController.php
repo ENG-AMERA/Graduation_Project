@@ -30,7 +30,7 @@ class ConsumerController extends Controller
     public function ShowProductsOfCategoryc($pharmaid,$categoryid){
      return $this->productrepo->ShowProductsOfCategory($pharmaid,$categoryid);
     }
-   Public function Allcategories(){
+   Public function Allcategoriesc(){
         return $this->productrepo->Allcategories();
     }
     public function AddToCart(Request $request){
