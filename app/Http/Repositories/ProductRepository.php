@@ -97,6 +97,33 @@ public function ShowProductsOfCategory($pharmaid,$categoryid)
 
 }
 
+public function ShowProductsOfCategoryph($categoryid)
+{
+    $user_id=Auth::id();
+    $pharmacist=Pharmacist::where('user_id',$user_id)->first();
+    $pharmaid=$pharmacist->pharma->id;
+        $products = Product::where('pharma_id', $pharmaid)
+                ->where('category_id', $categoryid)
+                ->with('types')
+                ->get();
+
+    return response()->json([
+        'products' => $products,
+    ], 200);
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
   public function addnewtype($request,$cart){
    $type=Type::where('id',$request->type_id)->first();

@@ -37,8 +37,8 @@ class PharmacistController extends Controller
         return $this->productrepo->Allcategories();
     }
 
-     public function ShowProductsOfCategory($pharmaid,$categoryid){
-     return $this->productrepo->ShowProductsOfCategory($pharmaid,$categoryid);
+     public function ShowProductsOfCategoryph($categoryid){
+     return $this->productrepo->ShowProductsOfCategoryph($categoryid);
     }
 
     public function addarticel(Request $request){

@@ -110,7 +110,7 @@ Route::post('acceptOrder', [PharmaController::class, 'acceptOrder']);
 Route::post('refuseOrder', [PharmaController::class, 'refuseOrder']);
   Route::post('/Addproduct', [PharmacistController::class, 'Addproduct']);
   Route::get('/Allcategories', [PharmacistController::class, 'Allcategories']);
-  Route::get('/ShowProductsOfCategory/{pharma_id}/{category_id}', [PharmacistController::class, 'ShowProductsOfCategory']);//pharma,category
+  Route::get('/ShowProductsOfCategoryph/{category_id}', [PharmacistController::class, 'ShowProductsOfCategoryph']);//pharma,category
   Route::post('/addarticel', [PharmacistController::class, 'addarticel']);
   Route::get('/showmyarticles', [PharmacistController::class, 'showmyarticles']);
   Route::post('/deletearticle/{id}', [PharmacistController::class, 'deletearticle']);
