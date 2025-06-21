@@ -27,7 +27,6 @@ public function rules() : array
             'name'        => ['required','string','max:255'],
             'description' => ['nullable','string'],
             'category_id' => ['required','exists:categories,id'],
-            'pharma_id'   => ['required','exists:pharmas,id'],
             'has_types'   => ['required','in:0,1'],
             'image'       => ['nullable','image','mimes:jpeg,png,jpg'],
             'price'       => ['required_if:has_types,0','numeric','min:0'],

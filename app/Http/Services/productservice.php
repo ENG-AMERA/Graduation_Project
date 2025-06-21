@@ -6,6 +6,7 @@ use App\Models\Cart;
 use App\Models\Type;
 use App\Models\Product;
 use App\Models\Cart_Item;
+use App\Models\Pharmacist;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Repositories\ProductRepository;
 
@@ -19,11 +20,14 @@ class productservice{
     }
 
     public function addproduct($request){
+    $user_id=Auth::id();
+    $pharmacist=Pharmacist::where('user_id',$user_id)->first();
+    $pharmaid=$pharmacist->pharma->id;
         if ($request->has_types=='1'){
-             return $this->ProductRepository->addproductwithtypes($request);
+             return $this->ProductRepository->addproductwithtypes($pharmaid,$request);
         }
            if ($request->has_types=='0'){
-             return $this->ProductRepository->Addmainproduct( $request);
+             return $this->ProductRepository->Addmainproduct($pharmaid ,$request);
         }
     }
 

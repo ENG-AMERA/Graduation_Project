@@ -3,14 +3,15 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\PharmaController;
-use App\Http\Controllers\ConsumerController;
-use App\Http\Controllers\delivaryController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OrdersController;
-use App\Http\Controllers\PharmacistController;
-
-
+use App\Http\Controllers\PharmaController;
 use App\Http\Controllers\QrCodeController;
+use App\Http\Controllers\ConsumerController;
+
+
+use App\Http\Controllers\delivaryController;
+use App\Http\Controllers\PharmacistController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -59,6 +60,12 @@ Route::delete('/pharmacist/{id}', [PharmaController::class, 'deletePharmacist'])
 
 Route::post('/accept_delivary', [delivaryController::class, 'accept']);
 Route::delete('/delivary/{id}', [delivaryController::class, 'deletdelivery']);
+
+
+Route::get('/getalldelivaries', [AdminController::class, 'getalldelivaries']);
+Route::get('/getallusers', [AdminController::class, 'getallusers']);
+
+Route::get('/getallpharmas', [AdminController::class, 'getallpharmas']);
 
 });
 

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ProductRepository{
 
-    public function Addmainproduct($request)
+    public function Addmainproduct($pharmaid,$request)
 {
    if ($request->hasFile('image')) {
     $image = $request->file('image');
@@ -32,7 +32,7 @@ class ProductRepository{
             'quantity' => $request->quantity,
             'image' => $imageRelativePath,
             'category_id' => $request->category_id,
-            'pharma_id' => $request->pharma_id,
+            'pharma_id' => $pharmaid,
             'has_variants'=>$request->has_types,
         ]);
 
@@ -40,10 +40,10 @@ class ProductRepository{
      return $product;
 }
 
-public function addproductwithtypes($request)
+public function addproductwithtypes($pharmaid,$request)
 {
 
-   $product= $this->Addmainproduct($request);
+   $product= $this->Addmainproduct($pharmaid,$request);
    $productid=$product->id;
      $names = $request->input('tname');
     $prices = $request->input('tprice');
