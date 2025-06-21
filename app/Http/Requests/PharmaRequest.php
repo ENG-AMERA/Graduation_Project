@@ -25,9 +25,9 @@ class PharmaRequest extends FormRequest
         'length' => 'required',
         'width' => 'required',
         'name' => 'required|string|max:255',
-        'license' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image file, size limit 2MB
+        'license' => 'required|image|mimes:jpeg,png,jpg,gif', // Validate image file, size limit 2MB
         'phone' => 'required|string',
-        'certificate' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image file, size limit 2MB
+        'certificate' => 'required|image|mimes:jpeg,png,jpg,gif', // Validate image file, size limit 2MB
         'description' => 'nullable|string',
     ];
        

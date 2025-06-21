@@ -75,49 +75,7 @@ class PharmaRepository
             ->get();
     }
 
-    
-    public function getAvailablePublicOrders()
-    {
-      
-    $user = Auth::user();
 
-    $pharmacist = Pharmacist::where('user_id', $user->id)->first();
-
-    if (!$pharmacist) {
-        throw new \Exception('Pharmacist not found for this user.');
-    }
-
-    $pharmaId = $pharmacist->pharma_id;
-
-    $orders = PharmaUser::with(['order' => function ($query) {
-        $query->select('id', 'photo');
-    }])
-    ->where('type', 0)
-    ->whereNull('accept_pharma')
-    ->where('pharma_id', $pharmaId)
-    ->get();
-
-    $orders->each(function ($pharmaUser) {
-        if ($pharmaUser->order) {
-            $photo = $pharmaUser->order->photo;
-
-            if ($photo) {
-                // Check if photo is a full URL
-                if (filter_var($photo, FILTER_VALIDATE_URL)) {
-                    $parsedUrl = parse_url($photo);
-                    $relativePath = ltrim($parsedUrl['path'], '/'); // remove leading slash
-                } else {
-                    $relativePath = $photo; // already relative or just filename
-                }
-                $pharmaUser->order->photo_path = $relativePath;
-            } else {
-                $pharmaUser->order->photo_path = null;
-            }
-        }
-    });
-
-    return $orders;
-    }
 public function getAvailablePrivateOrders()
 {
     $user = Auth::user();
@@ -130,26 +88,38 @@ public function getAvailablePrivateOrders()
 
     $pharmaId = $pharmacist->pharma_id;
 
-    $orders = PharmaUser::with(['order' => function ($query) {
-        $query->select('id', 'photo');
+    $pharmaUsers = PharmaUser::with(['order' => function ($query) {
+        $query->select(
+            'id',
+            'user_id',
+            'name_medicine',
+            'photo',
+            'length',
+            'width',
+            'type',
+            'time',
+            'created_at',
+            'updated_at'
+        );
     }])
     ->where('type', 1)
     ->whereNull('accept_pharma')
     ->where('pharma_id', $pharmaId)
     ->get();
 
-    $orders->each(function ($pharmaUser) {
+    // Add photo_path inside order relation
+    $pharmaUsers->each(function ($pharmaUser) {
         if ($pharmaUser->order) {
             $photo = $pharmaUser->order->photo;
 
             if ($photo) {
-                // Check if photo is a full URL
                 if (filter_var($photo, FILTER_VALIDATE_URL)) {
                     $parsedUrl = parse_url($photo);
-                    $relativePath = ltrim($parsedUrl['path'], '/'); // remove leading slash
+                    $relativePath = ltrim($parsedUrl['path'], '/');
                 } else {
-                    $relativePath = $photo; // already relative or just filename
+                    $relativePath = $photo;
                 }
+
                 $pharmaUser->order->photo_path = $relativePath;
             } else {
                 $pharmaUser->order->photo_path = null;
@@ -157,16 +127,14 @@ public function getAvailablePrivateOrders()
         }
     });
 
-    return $orders;
+    return $pharmaUsers;
 }
 
-    /*
 
-public function getAvailablePrivateOrders()
+public function getAvailablePublicOrders()
 {
     $user = Auth::user();
 
-    // Get the pharmacist based on user ID
     $pharmacist = Pharmacist::where('user_id', $user->id)->first();
 
     if (!$pharmacist) {
@@ -175,15 +143,47 @@ public function getAvailablePrivateOrders()
 
     $pharmaId = $pharmacist->pharma_id;
 
-    // Get private orders where pharma_id matches
-    return PharmaUser::with('order')
-        ->where('type', 1)
-        ->where('accept_pharma',null)
-        ->where('pharma_id', $pharmaId)
-        ->get();
-}
-*/
+    $pharmaUsers = PharmaUser::with(['order' => function ($query) {
+        $query->select(
+            'id',
+            'user_id',
+            'name_medicine',
+            'photo',
+            'length',
+            'width',
+            'type',
+            'time',
+            'created_at',
+            'updated_at'
+        );
+    }])
+    ->where('type', 0)
+    ->whereNull('accept_pharma')
+    ->where('pharma_id', null)
+    ->get();
 
+    // Add photo_path inside order relation
+    $pharmaUsers->each(function ($pharmaUser) {
+        if ($pharmaUser->order) {
+            $photo = $pharmaUser->order->photo;
+
+            if ($photo) {
+                if (filter_var($photo, FILTER_VALIDATE_URL)) {
+                    $parsedUrl = parse_url($photo);
+                    $relativePath = ltrim($parsedUrl['path'], '/');
+                } else {
+                    $relativePath = $photo;
+                }
+
+                $pharmaUser->order->photo_path = $relativePath;
+            } else {
+                $pharmaUser->order->photo_path = null;
+            }
+        }
+    });
+
+    return $pharmaUsers;
+}
 public function acceptOrder(array $data)
 {
 
