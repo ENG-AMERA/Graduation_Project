@@ -74,10 +74,6 @@ class ConsumerController extends Controller
         return $this->articlerepo->removelike($id);
     }
 
-    public function evaluateproduct(Request $request){
-        return $this->productrepo->evaluateproduct($request);
-    }
-
    public function addrecommendation(AddRecommendationRequest $request)
 {
     return $this->productrepo->addrecommendation($request->validated());
@@ -99,6 +95,10 @@ class ConsumerController extends Controller
 
     public function show_qr_ofcartorderwithdetail($cartorder_id){
         return $this->cartorderrepo->show_qr_ofcartorderwithdetail($cartorder_id);
+    }
+
+    public function getproductofcart(){
+        return $this->productrepo->getproductofcart();
     }
 
 

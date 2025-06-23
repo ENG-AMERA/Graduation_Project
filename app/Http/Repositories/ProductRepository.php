@@ -300,14 +300,12 @@ return response()->json(['message' => 'product added successfully.'], 201);
 return response()->json(['message' => 'product minused successfully.'], 201);
   }
 
-  public function evaluateproduct($request){
-    $product=Product::where('id',$request->product_id)->first();
+  public function evaluateproduct($product_id,$evaluation){
+    $product=Product::where('id',$product_id)->first();
     $product->people=$product->people + 1;
-    $product->evaluation=$product->evaluation + $request->evaluation;
+    $product->evaluation=$product->evaluation + $evaluation;
     $product->finalevaluation=$product->evaluation/$product->people;
     $product->save();
-
-    return $product->finalevaluation;
 }
 
 public function addrecommendation(array $data)
@@ -318,7 +316,10 @@ public function addrecommendation(array $data)
         'content'     => $data['content'],
         'product_id'  => $data['product_id'],
         'user_id'     => $id,
-    ]);
+        'starnumber'  => $data['starnumber'],
+        ]);
+
+        $this->evaluateproduct($data['product_id'] , $data['starnumber']);
 
     if ($recommendation) {
         $pharmacist = Pharmacist::find($data['pharmacist_id']);
@@ -372,5 +373,17 @@ public function editquantityofproduct($request){
     $type->save();
 }
 
+public function getproductofcart(){
+    $user_id=Auth::id();
+    $item=Cart::where('user_id',$user_id)->with('cart_item.type')
+    ->with('cart_item.product')
+    ->with('pharma')
+    ->get();
+     return response()->json([
+        'cart info' => $item
+    ], 200);
+}
+
 
 }
+

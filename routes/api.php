@@ -88,14 +88,14 @@ Route::post('addlike/{id}', [ConsumerController::class,'addlike']);
 Route::post('adddislike/{id}', [ConsumerController::class,'adddislike']);
 Route::post('removelike/{id}', [ConsumerController::class,'removelike']);
 Route::post('removedislike/{id}', [ConsumerController::class,'removedislike']);
-Route::post('evaluateproduct', [ConsumerController::class,'evaluateproduct']);
+// Route::post('evaluateproduct', [ConsumerController::class,'evaluateproduct']);
 Route::post('addrecommendation', [ConsumerController::class,'addrecommendation']);
 Route::get('showRecommendationOfProduct/{id}', [ConsumerController::class,'showRecommendationOfProduct']);
 Route::post('deleteRecommendation/{id}', [ConsumerController::class,'deleteRecommendation']);
 Route::post('confirmcartorder', [ConsumerController::class,'confirmcartorder']);
 Route::get('show_qr_ofcartorderwithdetail/{id}', [ConsumerController::class,'show_qr_ofcartorderwithdetail']);
 Route::get('getPharmacists', [PharmaController::class, 'getPharmacists']);
-
+Route::get('getproductofcart', [ConsumerController::class,'getproductofcart']);
 
 Route::post('acceptOrderc', [OrdersController::class,'acceptOrderc']);
 
@@ -144,5 +144,6 @@ Route::post('/applycartorder/{id}', [delivaryController::class, 'applycartorder'
 Route::post('/verifyqrforcartorder', [delivaryController::class, 'verifyqrforcartorder']);
 
 });
+
 
 

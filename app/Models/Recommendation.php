@@ -10,7 +10,7 @@ class Recommendation extends Model
     use HasFactory;
 
         protected $fillable = [
-        'user_id', 'content','product_id'
+        'user_id', 'content','product_id','starnumber'
     ];
 
     public function product(){

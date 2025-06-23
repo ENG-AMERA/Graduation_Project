@@ -3,6 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\Validator;
+
 
 class AddRecommendationRequest extends FormRequest
 {
@@ -25,6 +28,13 @@ class AddRecommendationRequest extends FormRequest
             'content'        => 'required|string|max:1000',
             'product_id'     => 'required|exists:products,id',
             'pharmacist_id'  => 'required|exists:pharmacists,id',
+            'starnumber'     => 'required|max:5|min:1'
         ];
     }
+        protected function failedValidation(Validator $validator): void
+{
+    throw new HttpResponseException(
+        response()->json(['errors' => $validator->errors()], 422)
+    );
+}
 }

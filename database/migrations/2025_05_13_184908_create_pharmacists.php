@@ -30,7 +30,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('pharmacists');
-      
+
     Schema::table('pharmacists', function (Blueprint $table) {
         $table->dropColumn('accept_point');
     });
