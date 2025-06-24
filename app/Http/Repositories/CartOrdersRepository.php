@@ -5,11 +5,12 @@ use App\Models\Cart;
 use App\Models\Type;
 use App\Models\Pharma;
 use App\Models\Product;
+use App\Models\Delivery;
 use App\Models\CartOrder;
+use App\Models\Pharmacist;
 use Illuminate\Support\Str;
 use App\Models\CartOrderItem;
 use App\Models\ApplyCartOrder;
-use App\Models\Delivery;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -157,9 +158,13 @@ public function calculateDeliveryPrice($lat1, $lon1, $lat2, $lon2, $pricePerKm =
     return round($deliveryPrice, 2);
 }
 
-public function getallcartorderforpharmacist($pharma_id){
+public function getallcartorderforpharmacist()
+{
+    $user_id=Auth::id();
+    $pharmacist=Pharmacist::where('user_id',$user_id)->first();
+    $pharmaid=$pharmacist->pharma->id;
    $cartOrders = CartOrder::with(['cartorderitem.product', 'cartorderitem.type'])
-        ->where('pharma_id', $pharma_id)
+        ->where('pharma_id', $pharmaid)
         ->where('accepted', 0)
         ->get();
 

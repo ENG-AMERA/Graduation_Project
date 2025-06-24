@@ -127,7 +127,7 @@ Route::post('refuseOrder', [PharmaController::class, 'refuseOrder']);
   Route::post('acceptRecommendation', [PharmaController::class, 'acceptRecommendation']);
 Route::post('refuseRecommendation', [PharmaController::class, 'refuseRecommendation']);
 
-  Route::get('/getallcartorderforpharmacist/{id}', [PharmacistController::class, 'getallcartorderforpharmacist']);
+  Route::get('/getallcartorderforpharmacist', [PharmacistController::class, 'getallcartorderforpharmacist']);
   Route::post('/acceptcartorder/{id}', [PharmacistController::class, 'acceptcartorder']);
   Route::post('/editproduct', [PharmacistController::class, 'editproduct']);
   Route::post('/edittype', [PharmacistController::class, 'edittype']);

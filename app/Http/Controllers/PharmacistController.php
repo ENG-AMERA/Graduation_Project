@@ -62,9 +62,9 @@ class PharmacistController extends Controller
         return $this->articlerepo->edittopic($request);
     }
 
-     public function getallcartorderforpharmacist($pharma_id)
+     public function getallcartorderforpharmacist()
      {
-        return $this->cartorderrepo->getallcartorderforpharmacist($pharma_id);
+        return $this->cartorderrepo->getallcartorderforpharmacist();
     }
       public function acceptcartorder($cartorder_id)
      {
