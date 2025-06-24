@@ -240,11 +240,11 @@ public function ShowProductsOfCategoryph($categoryid)
   {
 
     $Item=Cart_Item::where('id',$itemid)->first();
-    $Item->quantity=$Item->quantity + 1;
      if($Item->type_id){
     $type=Type::where('id',$Item->type_id)->first();
     $cart=Cart::where('id',$Item->cart_id)->first();
-    if($type->quantity>=$type->quantity+1){
+    if($type->quantity >= $Item->quantity+1){
+    $Item->quantity=$Item->quantity + 1;
     $price=$type->price;
     $Item->totalprice=$Item->totalprice+$price;
     $cart->totalprice=$cart->totalprice+$price;
@@ -253,13 +253,12 @@ public function ShowProductsOfCategoryph($categoryid)
      return response()->json(['message' => ' quantity is not available.'], 200);
    }
 
-
-
 }
    else{
     $product=Product::where('id',$Item->product_id)->first();
     $cart=Cart::where('id',$Item->cart_id)->first();
-    if($product->quantity>=$product->quantity+1){
+    if($product->quantity >= $Item->quantity+1){
+    $Item->quantity=$Item->quantity + 1;
     $price=$product->price;
     $Item->totalprice=$Item->totalprice+$price;
     $cart->totalprice=$cart->totalprice+$price;
