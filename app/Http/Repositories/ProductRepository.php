@@ -275,29 +275,45 @@ return response()->json(['message' => 'product added successfully.'], 201);
   }
 
 
-    public function EditCartMinusOne($itemid)
-    {
-    $user_id=Auth::id();
-    $Item=Cart_Item::where('id',$itemid)->first();
-    $Item->quantity=$Item->quantity - 1;
-     if($Item->type_id){
-    $type=Type::where('id',$Item->type_id)->first();
-    $cart=Cart::where('id',$Item->cart_id)->first();
-    $price=$type->price;
-    $Item->totalprice=$Item->totalprice-$price;
-    $cart->totalprice=$cart->totalprice-$price;
-   }
-   else{
-    $product=Product::where('id',$Item->product_id)->first();
-    $cart=Cart::where('id',$Item->cart_id)->first();
-    $price=$product->price;
-    $Item->totalprice=$Item->totalprice-$price;
-    $cart->totalprice=$cart->totalprice-$price;
-   }
-   $Item->save();
-   $cart->save();
-return response()->json(['message' => 'product minused successfully.'], 201);
-  }
+public function EditCartMinusOne($itemid)
+{
+    $user_id = Auth::id();
+    $Item = Cart_Item::where('id', $itemid)->first();
+
+    if (!$Item) {
+        return response()->json(['message' => 'item is not available'], 404);
+    }
+
+    $cart = Cart::where('id', $Item->cart_id)->first();
+
+    if ($Item->type_id) {
+        $type = Type::where('id', $Item->type_id)->first();
+        $price = $type->price;
+    } else {
+        $product = Product::where('id', $Item->product_id)->first();
+        $price = $product->price;
+    }
+
+    // إذا كانت الكمية 1، احذف العنصر
+    if ($Item->quantity == 1) {
+        $cart->totalprice -= $price;
+        $cart->save();
+        $Item->delete();
+
+        return response()->json(['message' => 'item is deleted'], 200);
+    }
+
+
+    $Item->quantity -= 1;
+    $Item->totalprice -= $price;
+    $Item->save();
+
+    $cart->totalprice -= $price;
+    $cart->save();
+
+    return response()->json(['message' => 'item is minuced'], 200);
+}
+
 
   public function evaluateproduct($product_id,$evaluation){
     $product=Product::where('id',$product_id)->first();

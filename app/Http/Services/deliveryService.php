@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class deliveryService
 {
-  
+
 
     protected $deliveryRepository;
 
@@ -19,11 +19,11 @@ class deliveryService
 
     public function createdelivery(array $data)
     {
-        
+
         $userId = Auth::id();
         // Create Pharmacist linked to Pharma
         $delivery = $this->deliveryRepository->createdelivery([
-         
+
             'user_id' => $userId,
             'delivery_method' => $data['delivery_method'],
             'number_method'=>$data['number_method']
@@ -31,7 +31,7 @@ class deliveryService
 
         return [
             'delivery' => $delivery,
-           
+
         ];
     }
 
@@ -48,25 +48,25 @@ class deliveryService
             throw new \Exception("Failed to delete delivery and pharma: " . $e->getMessage());
         }
     }
-    
 
-    
+
+
       public function getAllPending()
     {
         return $this->deliveryRepository->getPendingdelivery();
     }
 
 
-    
+
     public function getPendingDeliveryRequests()
     {
         return $this->deliveryRepository->getPendingRequestsWithPharmaAndOrder();
     }
-     
+
     public function getConsumerPendingRequests()
     {
         return $this->deliveryRepository->getConsumerPendingRequests();
     }
 
-    
+
 }

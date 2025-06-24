@@ -14,7 +14,7 @@ use App\Models\ApplyCartOrder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
-
+use Carbon\Carbon;
 class CartOrdersRepository{
 public function confirmorder($request)
 {
@@ -178,7 +178,11 @@ public function acceptcartorder($cartorder_id){
 }
 
 public function getcartordertodelivery(){
-    $orders = CartOrder::where('done',0)->where('accepted','1')->with(['user', 'pharma'])->get();
+    $today = Carbon::today()->toDateString();
+
+    $orders = CartOrder::where('done',0)
+    ->whereDate('deliverydate', $today)
+    ->where('accepted','1')->with(['user', 'pharma'])->get();
     return response()->json($orders);
 }
 
