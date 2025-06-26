@@ -95,8 +95,9 @@ Route::post('deleteRecommendation/{id}', [ConsumerController::class,'deleteRecom
 Route::post('confirmcartorder', [ConsumerController::class,'confirmcartorder']);
 Route::get('show_qr_ofcartorderwithdetail/{id}', [ConsumerController::class,'show_qr_ofcartorderwithdetail']);
 Route::get('getPharmacists', [PharmaController::class, 'getPharmacists']);
-Route::get('getproductofcart', [ConsumerController::class,'getproductofcart']);
-
+Route::get('getproductofcart/{id}', [ConsumerController::class,'getproductofcart']);//pharma_id
+Route::get('getordersforconsumer/{id}', [ConsumerController::class,'getordersforconsumer']);//pharma_id
+Route::get('cartorderarchive/{id}', [ConsumerController::class,'cartorderarchive']);//pharma_id
 Route::post('acceptOrderc', [OrdersController::class,'acceptOrderc']);
 
 

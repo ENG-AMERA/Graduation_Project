@@ -26,7 +26,7 @@ class CartOrder extends Model
     }
 
     public function applycartorder(){
-        return $this->hasone(ApplyCartOrder::class);
+        return $this->hasOne(ApplyCartOrder::class);
     }
 
 }

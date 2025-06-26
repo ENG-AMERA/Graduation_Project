@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\Validator;
 
 class PharmaRequest extends FormRequest
 {
@@ -30,6 +32,12 @@ class PharmaRequest extends FormRequest
         'certificate' => 'required|image|mimes:jpeg,png,jpg,gif', // Validate image file, size limit 2MB
         'description' => 'nullable|string',
     ];
-       
+
     }
+        protected function failedValidation(Validator $validator): void
+{
+    throw new HttpResponseException(
+        response()->json(['errors' => $validator->errors()], 422)
+    );
+}
 }

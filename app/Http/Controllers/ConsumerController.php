@@ -97,9 +97,19 @@ class ConsumerController extends Controller
         return $this->cartorderrepo->show_qr_ofcartorderwithdetail($cartorder_id);
     }
 
-    public function getproductofcart(){
-        return $this->productrepo->getproductofcart();
+    public function getproductofcart($pharma_id){
+        return $this->productrepo->getproductofcart($pharma_id);
     }
+
+        public function getordersforconsumer($pharma_id){
+        return $this->cartorderrepo->getordersforconsumer($pharma_id);
+    }
+
+        public function cartorderarchive($pharma_id){
+        return $this->cartorderrepo->cartorderarchive($pharma_id);
+    }
+
+
 
 
 

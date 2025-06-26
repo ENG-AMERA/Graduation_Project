@@ -13,10 +13,10 @@ class ApplyCartOrder extends Model
     ];
 
     public function delivery(){
-        $this->belongsTo(Delivery::class);
+      return  $this->belongsTo(Delivery::class);
     }
        public function cartorder(){
-        $this->belongsTo(CartOrder::class);
+      return  $this->belongsTo(CartOrder::class);
     }
 
 

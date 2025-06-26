@@ -388,16 +388,19 @@ public function editquantityofproduct($request){
     $type->save();
 }
 
-public function getproductofcart(){
+public function getproductofcart($pharma_id)
+{
     $user_id=Auth::id();
-    $item=Cart::where('user_id',$user_id)->with('cart_item.type')
-    ->with('cart_item.product')
+    $item=Cart::where('pharma_id',$pharma_id)->where('user_id',$user_id)->with('cart_item.product')
+    ->with('cart_item.type')
     ->with('pharma')
     ->get();
      return response()->json([
         'cart info' => $item
     ], 200);
+
 }
+
 
 
 }

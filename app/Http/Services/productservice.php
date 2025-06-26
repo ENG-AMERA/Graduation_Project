@@ -35,7 +35,8 @@ class productservice{
     public function addtocart($request)
     {
         $user_id=Auth::id();
-        $cart=Cart::where('user_id',$user_id)->first();
+        $cart=Cart::where('user_id',$user_id)
+        ->where('pharma_id',$request->pharma_id)->first();
 
         if($request->type_id)
         {

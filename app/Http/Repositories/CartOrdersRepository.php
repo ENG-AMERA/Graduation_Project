@@ -259,6 +259,27 @@ return response()->json([
         ]);
     }
 
+    public function getordersforconsumer($pharma_id){
+        $user_id=Auth::id();
+         $cart_order=CartOrder::where('user_id',$user_id)->where('pharma_id',$pharma_id)
+                            ->where('done',1)
+                           ->where('accepted',1)->where('verified',0)->with('applycartorder')
+                           ->with('applycartorder.delivery')->get();
+         return response()->json([
+            'orders' => $cart_order,
+        ]);
+
+    }
+
+    public function cartorderarchive($pharma_id){
+                $user_id=Auth::id();
+         $cart_order=CartOrder::where('user_id',$user_id)->where('pharma_id',$pharma_id)
+                                     ->where('done',1)
+                           ->where('accepted',1)->where('verified',1)->with('applycartorder')
+                           ->with('applycartorder.delivery')->get();
+         return response()->json([
+            'archive' => $cart_order,
+        ]);    }
 
 
 }
