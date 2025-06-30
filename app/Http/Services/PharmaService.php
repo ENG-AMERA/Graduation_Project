@@ -158,4 +158,15 @@ public function refuseRecommendation($userId)
 
 
 
+    public function searchByName($name)
+    {
+        return $this->pharmaRepository->searchByName($name);
+    }
+
+    
+    public function storeComplaint(array $data)
+    {
+        return $this->pharmaRepository->store($data);
+    }
+
 }

@@ -108,6 +108,16 @@ Route::post('refuseOrderc', [OrdersController::class,'refuseOrderc']);
 Route::post('/getConsumerPendingRequests', [delivaryController::class, 'getConsumerPendingRequests']);
 
 Route::post('/applyPointDiscountByOrder', [OrdersController::class, 'applyPointDiscount']);
+
+Route::post('profile', [ConsumerController::class,'profile']);
+
+Route::post('updatePhoto', [ConsumerController::class,'updatePhoto']);
+
+Route::post('search', [PharmaController::class, 'search']);
+
+Route::post('store', [PharmaController::class, 'store']);
+    
+
 });
 
 Route::middleware(['auth:api', 'pharmacist'])->group(function () {

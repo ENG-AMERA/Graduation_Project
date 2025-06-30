@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Services\productservice;
 use App\Http\Repositories\ArticleRepository;
+use App\Http\Repositories\authrepo;
 use App\Http\Repositories\ProductRepository;
 use App\Http\Requests\AddRecommendationRequest;
 use App\Http\Requests\ConfirmCartOrderRequest;
 use App\Http\Repositories\CartOrdersRepository;
-
+   use App\Http\Requests\UpdatePhotoRequest;
+use Illuminate\Support\Facades\Auth;
 
 class ConsumerController extends Controller
 {
@@ -17,14 +19,17 @@ class ConsumerController extends Controller
     protected $productservice;
     protected $articlerepo;
     protected $cartorderrepo;
-
+    protected $authrepo;
     public function __construct(ProductRepository $productrepo ,productservice $productservice ,
-    ArticleRepository $articlerepo , CartOrdersRepository $cartorderrepo)
+
+    ArticleRepository $articlerepo , CartOrdersRepository $cartorderrepo, authrepo $authrepo )
     {
         $this->productrepo = $productrepo;
         $this->productservice = $productservice;
         $this->articlerepo = $articlerepo;
          $this->cartorderrepo = $cartorderrepo;
+           $this->authrepo = $authrepo;
+
 
     }
     public function ShowProductsOfCategoryc($pharmaid,$categoryid){
@@ -112,6 +117,29 @@ class ConsumerController extends Controller
 
 
 
+    public function profile()
+    {
+        $user = Auth::user();
+        $profile = $this->authrepo->getUserProfileById($user->id);
 
+        return response()->json([
+            'status' => true,
+            'data' => $profile
+        ]);
+    }
+
+ 
+
+public function updatePhoto(UpdatePhotoRequest $request)
+{
+    $user = auth()->user();
+    $path = $this->authrepo->updateUserPhoto($user->id, $request->file('photo'));
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Photo updated successfully',
+        'photo_url' => $path,
+    ]);
+}
 
 }

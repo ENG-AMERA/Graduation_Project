@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Repositories;
 
+use App\Models\Complaint;
 use App\Models\DeliveryRequest;
 use App\Models\Pharma;
 use App\Models\Pharmacist;
@@ -307,5 +308,13 @@ public function handleRefuse($userId)
     return response()->json(['message' => 'refuse done']);
 }
 
+public function searchByName($name)
+{
+    return Pharma::whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($name) . '%'])->get();
+}
 
+ public function store(array $data)
+    {
+        return Complaint::create($data);
+    }
 }

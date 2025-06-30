@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\EmailVerificationCode;
 use Illuminate\Auth\Events\Registered;
 use Tymon\JWTAuth\Facades\JWTAuth; // Import JWTAuth facade
+
+  // app/Repositories/UserRepository.php
+
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 class authrepo{
 /*
 public function register($request)
@@ -85,4 +90,44 @@ public function register($request)
         'token' => $token,  // Send the token in the response
     ], 201);
 }
+
+    public function getUserProfileById($id)
+    {
+        return User::select([
+                'firstname',
+                'lastname',
+                'email',
+                'gender',
+                'age',
+                'phone',
+                'location',
+                'points',
+                'photo' // Optional: can be null
+            ])
+            ->where('id', $id)
+            ->first();
+    }
+
+ 
+public function updateUserPhoto($userId, $photoFile)
+{
+    if ($photoFile) {
+        $fileName = Str::uuid() . '.' . $photoFile->getClientOriginalExtension();
+
+        // Move the file to the public/photos directory
+        $photoFile->move(public_path('photos'), $fileName);
+
+        // Save the relative path in the database
+        $user = User::findOrFail($userId);
+        $user->photo = 'public/photos/' . $fileName;
+        $user->save();
+
+        // Return the full URL to access the photo
+        return ('public/photos/' . $fileName);
+    }
+
+    return null;
+}
+
+
 }
