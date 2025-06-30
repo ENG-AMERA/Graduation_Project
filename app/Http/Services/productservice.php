@@ -38,7 +38,7 @@ class productservice{
         $cart=Cart::where('user_id',$user_id)
         ->where('pharma_id',$request->pharma_id)->first();
 
-        if($request->type_id)
+        if($request->filled('type_id') && $request->filled('product_id'))//edit
         {
 
             $type=Type::where('id',$request->type_id)->first();
@@ -46,7 +46,7 @@ class productservice{
     {
             if($cart){
                          $existingItem = Cart_Item::where('cart_id', $cart->id)
-        ->where('product_id', $request->product_id)
+        ->where('product_id', $request->product_id)// غالبا بدا حذف
         ->where('type_id', $request->type_id)
         ->first();
         if($existingItem ){
@@ -74,7 +74,7 @@ class productservice{
 
 
     }
-        else{
+        if($request->filled('product_id') && $request->missing('type_id')){//edit
             $product=Product::where('id',$request->product_id)->first();
 
             if($product->quantity>=$request->quantity)
