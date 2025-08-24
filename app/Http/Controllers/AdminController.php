@@ -27,6 +27,38 @@ class AdminController extends Controller
     return $this->adminrepo->getallpharmas();
 }
 
+    public function bills($pharma_id){
+
+    return $this->adminrepo->bills($pharma_id);
+}
+
+public function getcomplaint(){
+    return $this->adminrepo->getcomplaint();
+}
+public function getpharmaslocation(){
+  return $this->adminrepo->getpharmaslocation();
+}
+public function deleteuser($user_id){
+  return $this->adminrepo->deleteuser($user_id);
+}
+
+public function deletepharma($pharma_id){
+  return $this->adminrepo->deletepharma($pharma_id);
+}
+public function getMonthlyOrderCounts(){
+  return $this->adminrepo->getMonthlyOrderCounts();
+}
+
+public function detect_price(Request $request){
+    return $this->adminrepo->detect_price($request);
+}
+public function edit_price(Request $request){
+    return $this->adminrepo->edit_price($request);
+}
+
+
+
+
 
 
 

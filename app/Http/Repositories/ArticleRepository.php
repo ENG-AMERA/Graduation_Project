@@ -3,6 +3,7 @@ namespace App\Http\Repositories;
 
 use App\Models\Article;
 use App\Models\Pharmacist;
+use App\Models\Reactedpeople;
 use Illuminate\Support\Facades\Auth;
 
 class ArticleRepository{
@@ -61,23 +62,82 @@ class ArticleRepository{
 }
 
 public function addlike($id){
-
+    $user_id=Auth::id();
+     $reactedpeople=Reactedpeople::where('article_id',$id)
+                       ->where('user_id',$user_id)
+                       ->first();
+        if(!$reactedpeople)
+            {
+   Reactedpeople::create([
+        'user_id'=>$user_id,
+        'article_id'=>$id,
+        'reactiontype'=>1,
+    ]);
     $article=Article::where('id',$id)->first();
     $like =$article->like;
     $newlike=$like+1;
     $article->like=$newlike;
     $article->save();
-    return $article->like;
+
+    $reactedUsers = Reactedpeople::where('article_id', $id)
+        ->with('user')
+        ->get();
+
+      return response()->json([
+        'reactions_count' => $article->like,
+        'reacted_users'   => $reactedUsers,
+    ]);
+        }
+    else{
+         $reactedUsers = Reactedpeople::where('article_id', $id)
+        ->with('user')
+        ->get();
+             return response()->json([
+        'reactions_count' => 'incorrect message',
+        'reacted_users'   => $reactedUsers,
+    ]);
+    }
+
 }
 
 public function adddislike($id)
 {
     $article=Article::where('id',$id)->first();
+     $user_id=Auth::id();
+     $reactedpeople=Reactedpeople::where('article_id',$id)
+                       ->where('user_id',$user_id)
+                      ->first();
+     if(!$reactedpeople){
+    Reactedpeople::create([
+        'user_id'=>$user_id,
+        'article_id'=>$id,
+        'reactiontype'=>0,
+    ]);
     $dislike =$article->dislike;
     $newdislike=$dislike+1;
     $article->dislike=$newdislike;
     $article->save();
-    return $article->dislike;
+
+        $reactedUsers = Reactedpeople::where('article_id', $id)
+        ->with('user')
+        ->get();
+
+            return response()->json([
+        'reactions_count' => $article->dislike,
+        'reacted_users'   => $reactedUsers,
+    ]);
+     }
+
+     else{
+            $reactedUsers = Reactedpeople::where('article_id', $id)
+        ->with('user')
+        ->get();
+             return response()->json([
+        'reactions_count' => 'incorrect message',
+        'reacted_users'   => $reactedUsers,
+    ]);
+     }
+
 }
 
 public function editcontent($request){
@@ -94,17 +154,67 @@ $article->save();
 
 
 public function removelike($id){
- $article=Article::where('id',$id)->first();
- $article->like=$article->like - 1;
- $article->save();
- return $article->like;
+    $user_id=Auth::id();
+    $reactedpeople=Reactedpeople::where('article_id',$id)
+                       ->where('user_id',$user_id)
+                       ->where('reactiontype','1')->first();
+   if($reactedpeople){
+  $article=Article::where('id',$id)->first();
+  $article->like=$article->like - 1;
+  $article->save();
+  $reactedpeople->delete();
+      $reactedUsers = Reactedpeople::where('article_id', $id)
+        ->with('user')
+        ->get();
+            return response()->json([
+        'reactions_count' => $article->like,
+        'reacted_users'   => $reactedUsers,
+    ]);
+
+   }
+   else{
+
+         $reactedUsers = Reactedpeople::where('article_id', $id)
+        ->with('user')
+        ->get();
+             return response()->json([
+        'reactions_count' => 'incorrect message',
+        'reacted_users'   => $reactedUsers,
+    ]);
+}
+
 }
 
 public function removedislike($id){
- $article=Article::where('id',$id)->first();
- $article->dislike=$article->dislike - 1;
- $article->save();
- return $article->dislike;
+     $user_id=Auth::id();
+    $reactedpeople=Reactedpeople::where('article_id',$id)
+                       ->where('user_id',$user_id)
+                       ->where('reactiontype','0')->first();
+if($reactedpeople){
+   $article=Article::where('id',$id)->first();
+   $article->dislike=$article->dislike - 1;
+   $article->save();
+   $reactedpeople->delete();
+
+       $reactedUsers = Reactedpeople::where('article_id', $id)
+        ->with('user')
+        ->get();
+
+            return response()->json([
+        'reactions_count' => $article->dislike,
+        'reacted_users'   => $reactedUsers,
+    ]);
+    }
+else{
+            $reactedUsers = Reactedpeople::where('article_id', $id)
+        ->with('user')
+        ->get();
+             return response()->json([
+        'reactions_count' => 'incorrect message',
+        'reacted_users'   => $reactedUsers,
+    ]);
+}
+
 }
 
 

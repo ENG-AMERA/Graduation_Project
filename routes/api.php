@@ -68,6 +68,15 @@ Route::get('/getalldelivaries', [AdminController::class, 'getalldelivaries']);
 Route::get('/getallusers', [AdminController::class, 'getallusers']);
 
 Route::get('/getallpharmas', [AdminController::class, 'getallpharmas']);
+Route::get('/bills/{id}', [AdminController::class, 'bills']);//pharma_id
+Route::get('getcomplaint', [AdminController::class, 'getcomplaint']);
+Route::get('getpharmaslocation', [AdminController::class, 'getpharmaslocation']);
+Route::post('deleteuser/{id}', [AdminController::class, 'deleteuser']);
+Route::post('deletepharma/{id}', [AdminController::class, 'deletepharma']);
+Route::get('getMonthlyOrderCounts', [AdminController::class, 'getMonthlyOrderCounts']);
+Route::post('detect_price', [AdminController::class, 'detect_price']);
+Route::post('edit_price', [AdminController::class, 'edit_price']);
+
 
 });
 
@@ -118,10 +127,13 @@ Route::post('updatePhoto', [ConsumerController::class,'updatePhoto']);
 Route::post('search', [PharmaController::class, 'search']);
 
 Route::post('store', [PharmaController::class, 'store']);
+<<<<<<< HEAD
 //getConsumerPendingRequests
     
 Route::post('myOrders', [ConsumerController::class,'myOrders']);
 
+=======
+>>>>>>> 0695fccc96d503a1b5c8aeacca77e4f08ea61394
 
 
 });

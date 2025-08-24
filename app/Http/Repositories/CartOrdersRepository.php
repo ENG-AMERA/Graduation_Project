@@ -11,6 +11,7 @@ use App\Models\Pharmacist;
 use Illuminate\Support\Str;
 use App\Models\CartOrderItem;
 use App\Models\ApplyCartOrder;
+use App\Models\deliveryprice;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -131,8 +132,11 @@ public function confirmorder($request)
 
 
 
-public function calculateDeliveryPrice($lat1, $lon1, $lat2, $lon2, $pricePerKm = 2)
+public function calculateDeliveryPrice($lat1, $lon1, $lat2, $lon2)
 {
+    $priceobj=deliveryprice::first();
+     $pricePerKm= $priceobj->delivery_price;
+
     $earthRadius = 6371; // نصف قطر الأرض بالكيلومتر
 
     // تحويل الإحداثيات إلى راديان

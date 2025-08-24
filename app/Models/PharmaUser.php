@@ -22,7 +22,10 @@ class PharmaUser extends Model
 {
     return $this->belongsTo(Order::class);
 }
-
+    public function pharma()
+{
+    return $this->belongsTo(Pharma::class);
+}
 public function deliveryRequest()
 {
     return $this->hasOne(DeliveryRequest::class);

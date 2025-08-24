@@ -16,5 +16,9 @@ class Article extends Model
       return $this->belongsTo(Pharmacist::class);
     }
 
+    public function reactedpeople(){
+    return $this->hasMany(Reactedpeople::class);
+}
+
 
 }

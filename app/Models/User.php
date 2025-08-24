@@ -85,6 +85,11 @@ public function pharmas()
 }
 
 
+public function reactedpeople(){
+    return $this->hasMany(Reactedpeople::class);
+}
+
+
 
     /**
      * The attributes that should be hidden for serialization.
