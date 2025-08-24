@@ -521,15 +521,14 @@ public function handleRefuse($userId)
         return response()->json(['message' => 'User not found'], 404);
     }
 
-  
-
     // Optional: set accept_point in Pharmacist model if needed
-    $pharmacist = Pharmacist::where('id', $userId)->first();
+    $pharmacist = Pharmacist::where('user_id', $userId)->first();
     if ($pharmacist) {
         $pharmacist->update(['accept_point' => 0]);
+           return response()->json(['message' => 'refuse done']);
     }
 
-    return response()->json(['message' => 'refuse done']);
+ 
 }
 
 public function searchByName($name)

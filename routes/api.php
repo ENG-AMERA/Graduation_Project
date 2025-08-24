@@ -127,16 +127,15 @@ Route::post('updatePhoto', [ConsumerController::class,'updatePhoto']);
 Route::post('search', [PharmaController::class, 'search']);
 
 Route::post('store', [PharmaController::class, 'store']);
-<<<<<<< HEAD
+
 //getConsumerPendingRequests
     
 Route::post('myOrders', [ConsumerController::class,'myOrders']);
 
-=======
->>>>>>> 0695fccc96d503a1b5c8aeacca77e4f08ea61394
 
 
 });
+
 
 Route::middleware(['auth:api', 'pharmacist'])->group(function () {
 Route::post('getAvailablePublicOrders', [PharmaController::class, 'getAvailablePublicOrders']);
@@ -162,7 +161,7 @@ Route::post('refuseRecommendation', [PharmaController::class, 'refuseRecommendat
   Route::post('/edittype', [PharmacistController::class, 'edittype']);
 Route::post('/test-notification', [PharmaController::class, 'testNotification']);
 Route::post('/get_state', [PharmaController::class, 'get_state']);
-
+Route::post('/indexAcceptedForPharmacist', [PharmaController::class, 'indexAcceptedForPharmacist']);
 
 
 });

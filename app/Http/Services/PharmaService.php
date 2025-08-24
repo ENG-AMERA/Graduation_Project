@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use App\Http\Repositories\PharmaRepository;
 use App\Models\Pharmacist;
+use App\Models\PharmaUser;
 use Illuminate\Support\Facades\Auth;
 //use App\\Http\Repositories\PharmacistRepository;
 
@@ -218,5 +219,29 @@ public function refuseRecommendation($userId)
             ],
         ];
     }
+      public function getAcceptedOrdersForCurrentPharmacist()
+    {
+        $user = Auth::user();
+
+        // لو المستخدم مش صيدلاني أو ما إله سجل Pharmacist
+        $pharmacist = Pharmacist::where('user_id', $user->id)->first();
+        if (!$pharmacist) {
+            // ممكن ترجع Collection فاضية أو ترمي استثناء حسب ستايل مشروعك
+            return 0;
+        }
+
+        // استرجاع سجلات PharmaUser الخاصة بنفس الصيدلية وبالشروط
+        return PharmaUser::with([
+                'order',       // بيانات الطلب
+                'user',        // المستخدم صاحب الطلب (إن احتجته)
+                'pharma',      // الصيدلية
+            ])
+            ->where('pharma_id', $pharmacist->pharma_id)
+            ->where('accept_user', 1)
+            ->where('accept_pharma', 1)
+            ->latest('id')
+            ->get();
+    }
+
 
 }

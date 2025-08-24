@@ -159,4 +159,11 @@ public function search(Request $request)
             'accept_point' => $state
         ]);
     }
+
+    
+    public function indexAcceptedForPharmacist()
+    {
+        $orders = $this->pharmaService->getAcceptedOrdersForCurrentPharmacist();
+        return response()->json($orders);
+    }
 }

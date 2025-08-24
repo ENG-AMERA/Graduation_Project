@@ -3,6 +3,7 @@ namespace App\Http\Repositories;
 
 use App\Http\Services\FcmService;
 use App\Models\Delivery;
+use App\Models\deliveryprice;
 use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
@@ -37,7 +38,7 @@ class deliveryRepository
 
         return $delivery;
     }*/
-        public function accept(int $id, FcmService $fcmService): array
+        public function accept(int $id, FcmService $fcmService)
 {
  
     $delivery = DB::transaction(function () use ($id) {
@@ -95,7 +96,7 @@ class deliveryRepository
 }
 
 
-public function deletdelivery(int $id, FcmService $fcmService): array
+public function deletdelivery(int $id, FcmService $fcmService)
 {
     try {
        
