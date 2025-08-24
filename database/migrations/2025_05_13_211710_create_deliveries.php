@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('number_method')->nullable();
             $table->string('accept')->nullable();
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+         
             $table->timestamps();
         });
     }

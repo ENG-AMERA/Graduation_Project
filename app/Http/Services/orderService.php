@@ -3,7 +3,10 @@ namespace App\Http\Services;
 use Carbon\Carbon;
 use App\Http\Repositories\OrderRepository;
 use App\Http\Requests\ApplyPointDiscountRequest;
+use App\Models\Cart;
+use App\Models\Pharmacist;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
@@ -111,10 +114,10 @@ public function privateOrder(array $data, $user)
     }
   
   
-    public function applyPointDiscount(ApplyPointDiscountRequest $request)
+  /*  public function applyPointDiscount(ApplyPointDiscountRequest $request)
 {
     /** @var \App\Models\User $user */
-    $user = Auth::user();
+  /*  $user = Auth::user();
 
     if (!$user) {
         return response()->json(['error' => 'Unauthenticated.'], 401);
@@ -163,5 +166,88 @@ public function privateOrder(array $data, $user)
         'new_price' => $newPrice,
         'remaining_points' => $user->points
     ]);
+}*/
+
+
+
+public function applyPointDiscount(ApplyPointDiscountRequest $request)
+{
+    /** @var \App\Models\User $user */
+    $user = Auth::user();
+    if (!$user) {
+        return response()->json(['error' => 'Unauthenticated.'], 401);
+    }
+
+    $cartId     = $request->input('cart_id');      // بدّلنا من order_id إلى cart_id
+    $pointsUsed = (int) $request->input('points_used');
+
+    if ($pointsUsed <= 0) {
+        return response()->json(['error' => 'points_used must be > 0'], 422);
+    }
+
+    return DB::transaction(function () use ($user, $cartId, $pointsUsed) {
+
+       $cart = Cart::lockForUpdate()
+    ->where('id', $cartId)
+    ->where('user_id', $user->id)
+    ->first();
+
+if (!$cart) {
+    return response()->json(['error' => 'Cart not found for this user.'], 404);
+}
+
+$originalPrice = $cart->totalprice;
+
+        if (is_null($originalPrice)) {
+            // احسب من العناصر إن وُجدت
+            $originalPrice = optional($cart->items)->sum('totalprice') ?? 0;
+        }
+
+        // تأكّد أن في صيدلية مربوطة بالسلة
+        if (!$cart->pharma_id) {
+            return response()->json(['error' => 'Cart has no associated pharmacy.'], 422);
+        }
+
+        // 3) جلب الصيدلاني المرتبط بهذه الصيدلية والتأكد من قبول النقاط
+        $pharmacist = Pharmacist::where('pharma_id', $cart->pharma_id)->first();
+
+        if (!$pharmacist || (int)$pharmacist->accept_point !== 1) {
+            return response()->json(['error' => 'This pharmacist does not accept points.'], 403);
+        }
+
+        // 4) التحقق من رصيد نقاط المستخدم
+        if ($user->points < $pointsUsed) {
+            return response()->json(['error' => 'Not enough points.'], 400);
+        }
+
+        // 5) حساب الخصم وتطبيقه
+        // قيمة النقطة يحددها الصيدلاني: point_value
+        $pointValue = (float) $pharmacist->point_value;
+        if ($pointValue <= 0) {
+            return response()->json(['error' => 'Invalid point value configured for this pharmacist.'], 422);
+        }
+
+        $discount  = $pointValue * $pointsUsed;
+        $newPrice  = max($originalPrice - $discount, 0);
+
+        // 6) حفظ التغييرات: تحديث سعر السلة وتخفيض نقاط المستخدم
+        $cart->totalprice = $newPrice;
+        $cart->save();
+
+        $user->points = $user->points - $pointsUsed;
+        $user->save();
+
+        return response()->json([
+            'message'          => 'Discount applied successfully',
+            'cart_id'          => $cart->id,
+            'pharma_id'        => $cart->pharma_id,
+            'original_price'   => (float) $originalPrice,
+            'point_value'      => $pointValue,
+            'points_used'      => $pointsUsed,
+            'discount'         => (float) $discount,
+            'new_price'        => (float) $newPrice,
+            'remaining_points' => (int) $user->points,
+        ]);
+    });
 }
 }

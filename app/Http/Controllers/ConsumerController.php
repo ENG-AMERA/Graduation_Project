@@ -12,6 +12,7 @@ use App\Http\Requests\ConfirmCartOrderRequest;
 use App\Http\Repositories\CartOrdersRepository;
    use App\Http\Requests\UpdatePhotoRequest;
 use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ConsumerController extends Controller
 {
@@ -142,4 +143,13 @@ public function updatePhoto(UpdatePhotoRequest $request)
     ]);
 }
 
+
+ public function myOrders()
+    {
+        
+            $user = JWTAuth::parseToken()->authenticate(); 
+
+        $data = $this->productservice->getUserOrderSummariesByUserId($user->id);
+        return response()->json(['data' => $data], 200);
+    }
 }

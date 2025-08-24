@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\GenerateQrRequest;
 use App\Http\Requests\ShowQrRequest;
 use App\Http\Requests\VerifyQrRequest;
+use App\Http\Services\FcmService;
 use App\Http\Services\QrCodeService;
 use Illuminate\Http\Request;
 
@@ -16,18 +17,18 @@ class QrCodeController extends Controller
         $this->qrCodeService = $qrCodeService;
     }
 
-    public function generate(GenerateQrRequest $request)
-    {
-        return $this->qrCodeService->generateQr($request->order_id);
-    }
-
+    public function generate(GenerateQrRequest $request, FcmService $fcmService)
+{
+    return $this->qrCodeService->generateQr($request->order_id, $fcmService);
+}
     public function showQrFromDatabase(ShowQrRequest $request)
     {
         return $this->qrCodeService->showQr($request->order_id);
     }
 
-    public function verifyQr(VerifyQrRequest $request)
+    public function verifyQr(VerifyQrRequest $request, FcmService $fcmService)
     {
-        return $this->qrCodeService->verifyQr($request->qr);
-    }
+        return $this->qrCodeService->verifyQr($request->qr ,$fcmService);
 }
+    }
+

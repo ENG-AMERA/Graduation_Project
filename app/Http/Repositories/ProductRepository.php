@@ -7,6 +7,7 @@ use App\Models\Type;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Pharmacist;
+use App\Models\PharmaUser;
 use App\Models\Recommendation;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -401,7 +402,34 @@ public function getproductofcart($pharma_id)
 
 }
 
+  public function getUserOrderSummaries(int $userId)
+    {
+        $records = PharmaUser::query()
+            ->with([
+                'pharma:id,name',
+                'deliveryRequest:id,pharma_user_id,price,totalprice,done,updated_at',
+            ])
+            ->where('user_id', $userId)
+            ->orderByDesc('id')
+            ->get();
 
+        return $records->map(function (PharmaUser $pu) {
+            $dr = $pu->deliveryRequest;
+
+            $deliveryDate = ($dr && (int)$dr->done === 1)
+                ? optional($dr->updated_at)->toDateTimeString()
+                : null;
+
+            return [
+                'order_id'       => $pu->order_id,
+                'pharmacy_name'  => $pu->pharma->name ?? null,
+                'order_price'    => $dr->totalprice ?? null, // سعر الطلبية
+                'delivery_price' => $dr->price ?? null,      // سعر التوصيل
+                'delivery_date'  => $deliveryDate,           // تاريخ التوصيل
+                'type'           => ((int)$pu->type === 1) ? 'private' : 'public',
+            ];
+        })->values()->all();
+    }
 
 }
 

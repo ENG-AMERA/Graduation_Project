@@ -32,6 +32,7 @@ class RegisterRequest extends FormRequest
             'location' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'regex:/^[0-9+\-\s\(\)]+$/', 'min:8', 'max:20'],
             'gender' => ['required'],
+             'device_token'=>'required'
         ];
     }
     protected function failedValidation(Validator $validator): void

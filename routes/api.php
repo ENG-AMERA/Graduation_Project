@@ -40,6 +40,8 @@ Route::group([
 ], function ($router) {
     Route::post('/register', [UserController::class, 'register']);
     Route::post('/login', [UserController::class, 'login']);
+    //Route::post('/loginadmin', [UserController::class, 'loginadmin']);
+  
     Route::post('/logout', [UserController::class, 'logout']);
     Route::post('/refresh', [UserController::class, 'refresh']);
     Route::post('/me', [UserController::class, 'me']);
@@ -116,7 +118,11 @@ Route::post('updatePhoto', [ConsumerController::class,'updatePhoto']);
 Route::post('search', [PharmaController::class, 'search']);
 
 Route::post('store', [PharmaController::class, 'store']);
+//getConsumerPendingRequests
     
+Route::post('myOrders', [ConsumerController::class,'myOrders']);
+
+
 
 });
 
@@ -142,6 +148,9 @@ Route::post('refuseRecommendation', [PharmaController::class, 'refuseRecommendat
   Route::post('/acceptcartorder/{id}', [PharmacistController::class, 'acceptcartorder']);
   Route::post('/editproduct', [PharmacistController::class, 'editproduct']);
   Route::post('/edittype', [PharmacistController::class, 'edittype']);
+Route::post('/test-notification', [PharmaController::class, 'testNotification']);
+Route::post('/get_state', [PharmaController::class, 'get_state']);
+
 
 
 });
@@ -153,6 +162,7 @@ Route::post('/getPendingRequests', [delivaryController::class, 'getPendingReques
 Route::get('/getcartordertodelivery', [delivaryController::class, 'getcartordertodelivery']);
 Route::post('/applycartorder/{id}', [delivaryController::class, 'applycartorder']);
 Route::post('/verifyqrforcartorder', [delivaryController::class, 'verifyqrforcartorder']);
+Route::post('/acceptedRequests', [delivaryController::class, 'acceptedRequests']);
 
 });
 

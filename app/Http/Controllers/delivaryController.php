@@ -7,6 +7,7 @@ use App\Http\Requests\deliveryRequest;
 use App\Http\Services\deliveryService;
 use App\Http\Requests\AcceptDeliveryRequest;
 use App\Http\Repositories\CartOrdersRepository;
+use App\Http\Services\FcmService;
 
 class delivaryController extends Controller
 {
@@ -30,16 +31,17 @@ class delivaryController extends Controller
         ], 201);
     }
 
-       public function accept(AcceptDeliveryRequest $request)
+       public function accept(AcceptDeliveryRequest $request, FcmService $fcmService)
     {
-        $delivery = $this->deliveryService->accept($request->id);
+        $delivery = $this->deliveryService->accept($request->id,$fcmService);
         return response()->json(['message' => 'delivery accepted successfully', 'data' => $delivery], 200);
     }
-    public function deletdelivery($id)
+    
+    public function deletdelivery($id, FcmService $fcmService)
     {
         try {
-            $this->deliveryService->deletdelivery($id);
-            return response()->json(['message' => 'delivery and pharma deleted successfully.']);
+            $delivery  = $this->deliveryService->deletdelivery($id,$fcmService);
+            return response()->json(['message' => 'delivery and pharma deleted successfully.','data'=>  $delivery ],200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -71,6 +73,18 @@ class delivaryController extends Controller
         return $this->cartorderrepo->verifyQr($request);
     }
 
+   public function getConsumerPendingRequests()
+    {
+        $data= $this->deliveryService->getConsumerPendingRequests();
+         return response()->json($data);
+    }
 
+
+     public function acceptedRequests()
+    {
+        $requests = $this->deliveryService->getAcceptedRequestsByDelivery();
+
+        return response()->json($requests);
+    }
 
 }

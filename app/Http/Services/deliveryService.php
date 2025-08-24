@@ -3,6 +3,7 @@
 
 namespace App\Http\Services;
 use App\Http\Repositories\deliveryRepository;
+use App\Models\DeliveryRequest;
 use Illuminate\Support\Facades\Auth;
 //use App\\Http\Repositories\PharmacistRepository;
 
@@ -35,15 +36,16 @@ class deliveryService
         ];
     }
 
-    public function accept($id)
+    public function accept($id,FcmService $fcmService)
     {
-        return $this->deliveryRepository->accept($id);
+        return $this->deliveryRepository->accept($id,$fcmService);
     }
-    public function deletdelivery($id)
+
+    public function deletdelivery($id,FcmService $fcmService)
     {
         try {
             // Call the repository to delete the pharmacist and pharma
-            return $this->deliveryRepository->deletdelivery($id);
+            return $this->deliveryRepository->deletdelivery($id,$fcmService);
         } catch (\Exception $e) {
             throw new \Exception("Failed to delete delivery and pharma: " . $e->getMessage());
         }
@@ -67,6 +69,20 @@ class deliveryService
     {
         return $this->deliveryRepository->getConsumerPendingRequests();
     }
+public function getAcceptedRequestsByDelivery()
+    {
+        $deliveryId = auth()->id(); 
 
+        
+        $delivery = \App\Models\Delivery::where('user_id', $deliveryId)->first();
+
+        if (!$delivery) {
+            return collect(); 
+        }
+
+        return DeliveryRequest::with('pharmaUser.user', 'pharmaUser.pharma', 'pharmaUser.order')
+            ->where('delivery_id', $delivery->id)
+            ->get();
+    }
 
 }

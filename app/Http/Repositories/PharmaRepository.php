@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Repositories;
 
+use App\Http\Services\FcmService as ServicesFcmService;
 use App\Models\Complaint;
 use App\Models\DeliveryRequest;
 use App\Models\Pharma;
@@ -9,8 +10,13 @@ use App\Models\Role;
 use App\Models\PharmaUser;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Services\FcmService;
+use Illuminate\Support\Facades\DB;
+
 class PharmaRepository
 {
+
+
     public function createPharma(array $data)
     {
         return Pharma::create($data);
@@ -20,6 +26,68 @@ class PharmaRepository
     {
         return Pharmacist::create($data);
     }
+
+    
+public function accept($id, FcmService $fcmService)
+{
+    // نستخدم معاملة لضمان التناسق
+    $pharmacist = DB::transaction(function () use ($id) {
+        $pharmacist = Pharmacist::findOrFail($id);
+
+        // إذا كان مقبول مسبقًا لا مشكلة، سنثبت الدور ونكمل
+        $pharmacist->update(['accept' => 1]);
+
+        // أنشئ/ثبّت دور pharmacist بدون تكرار
+        Role::firstOrCreate([
+            'user_id' => $pharmacist->user_id,
+            'name'    => 'pharmacist',
+        ]);
+
+        // احذف دور Consumer إن وُجد (حساس لحالة الأحرف حسب بياناتك)
+        Role::where('user_id', $pharmacist->user_id)
+            ->whereIn('name', ['Consumer', 'consumer'])
+            ->delete();
+
+        return $pharmacist;
+    });
+
+    // تحميل المستخدم لجلب الـ device_token
+    $pharmacist->load('user');
+    $user = $pharmacist->user;
+
+    $notified = false;
+    $notify_info = null;
+
+    if ($user && !empty($user->device_token)) {
+        $title = 'تم قبولك كصيدلاني';
+        $body  = 'تهانينا! تم قبول طلبك وأصبحت تعمل كصيدلاني داخل التطبيق. يمكنك الآن تسجيل الدخول واستخدام صلاحياتك.';
+
+      
+        $data = [
+            'type'        => 'pharmacist_acceptance',
+            'user_id'     => $user->id,
+            'pharmacist_id' => $pharmacist->id,
+            'accepted'    => 1,
+        ];
+
+        $resp = $fcmService->sendNotification($user->device_token, $title, $body, $data);
+
+      
+        $notified    = ($resp['ok'] ?? false) === true;
+        $notify_info = $notified ? 'User notified via FCM.' : ($resp['error'] ?? 'FCM send failed.');
+    } else {
+        $notify_info = 'No device_token for user.';
+    }
+
+    return response()->json([
+        'message'      => 'Pharmacist accepted and role updated.',
+        'pharmacist_id'=> $pharmacist->id,
+        'user_id'      => $pharmacist->user_id,
+        'notified'     => $notified,
+        'notify_info'  => $notify_info,
+    ], 200);
+}
+    /*
     public function accept($id)
     {
         // Find the pharmacist by ID
@@ -39,7 +107,8 @@ class PharmaRepository
             // Delete the pharmacist record
 
         return $pharmacist;
-    }
+    }*/
+/*
     public function deletePharmacist($id)
     {
         try {
@@ -58,8 +127,62 @@ class PharmaRepository
             throw new \Exception("Error deleting pharmacist and pharma: " . $e->getMessage());
         }
     }
-
+*/
   
+    public function deletePharmacist(int $id, FcmService $fcmService)
+    {
+      
+        $pharmacist = Pharmacist::with('user')->findOrFail($id);
+        $user       = $pharmacist->user ?? User::find($pharmacist->user_id);
+        $userId     = $pharmacist->user_id;
+        $pharmaId   = $pharmacist->pharma_id;
+        $deviceToken = $user->device_token ?? null;
+
+        DB::transaction(function () use ($pharmacist, $pharmaId, $userId) {
+            if (!empty($pharmaId)) {
+                Pharma::where('id', $pharmaId)->delete();
+            }
+
+            Role::where('user_id', $userId)
+                ->whereIn('name', ['Pharmacist', 'pharmacist'])
+                ->delete();
+
+        
+            $pharmacist->delete();
+        });
+
+        // أرسل إشعار الرفض بعد نجاح الحذف
+        $notified = false;
+        $notifyInfo = 'No device_token for user.';
+        if (!empty($deviceToken)) {
+            $title = 'تم رفضك كصيدلاني';
+            $body  = 'نعتذر، تم رفض طلبك للعمل كصيدلاني في التطبيق.';
+
+            $data = [
+                'type'           => 'pharmacist_rejection',
+                'user_id'        => $userId,
+                'pharmacist_id'  => $id,
+                'pharma_id'      => $pharmaId,
+                'accepted'       => 0,
+            ];
+
+            $resp = $fcmService->sendNotification($deviceToken, $title, $body, $data);
+
+            // واجهة FcmService الموحّدة: ['ok' => bool, 'id' => ?string, 'error' => ?string]
+            $notified   = ($resp['ok'] ?? false) === true;
+            $notifyInfo = $notified ? 'User notified via FCM.' : ($resp['error'] ?? 'FCM send failed.');
+        }
+
+        // رجّع بيانات فقط — خليه الكونترولر يبني JSON
+        return [
+            'deleted'      => true,
+            'user_id'      => $userId,
+            'pharmacist_id'=> $id,
+            'pharma_id'    => $pharmaId,
+            'notified'     => $notified,
+            'notify_info'  => $notifyInfo,
+        ];
+    }
     
       public function getPendingPharmacists()
     {
@@ -228,7 +351,7 @@ public function acceptOrder(array $data)
     return response()->json(['message' => 'Order accepted and delivery request created'], 200);
 }
 
-
+/*
 public function refuseOrder(array $data)
 {
     $pharmaUser = PharmaUser::where('order_id', $data['order_id'])->first();
@@ -270,6 +393,107 @@ public function refuseOrder(array $data)
 }
 
 
+*/
+
+/*
+public function refuseOrder(array $data)
+{
+    $pharmaUser = PharmaUser::where('order_id', $data['order_id'])->first();
+
+    if (!$pharmaUser) {
+        return response()->json(['message' => 'PharmaUser not found'], 404);
+    }
+
+    $user = Auth::user();
+
+    $pharmacist = Pharmacist::where('user_id', $user->id)->first();
+
+    if (!$pharmacist) {
+        throw new \Exception('Pharmacist not found for this user.');
+    }
+
+    $pharmaId = $pharmacist->pharma_id;
+
+    // Update accept_pharma and reason
+    $pharmaUser->update([
+        'accept_pharma' => 0,
+        'reason' => $data['reason'],
+        'pharma_id' => $pharmaId,
+    ]);
+
+    // Create delivery request
+    DeliveryRequest::create([
+        'qr' => null,
+        'price' => null,
+        'delivery_id' => null,
+        'pharma_user_id' => $pharmaUser->id,
+    ]);
+
+$user = $pharmaUser->user;
+
+if ($user->device_token) {
+    app(\App\Services\FcmService::class)
+        ->sendNotification(
+            $user->device_token,
+            'Order Refused',
+            'Your order has been refused by the pharmacy. Reason: '.$data['reason']
+        );
+}
+
+    return response()->json(['message' => 'Order refused and delivery request created'], 200);
+}
+*/
+
+public function refuseOrder(array $data, FcmService $fcmService)
+{
+    $pharmaUser = PharmaUser::where('order_id', $data['order_id'])->first();
+
+    if (!$pharmaUser) {
+        return response()->json(['message' => 'PharmaUser not found'], 404);
+    }
+
+    $user = Auth::user();
+
+    $pharmacist = Pharmacist::where('user_id', $user->id)->first();
+
+    if (!$pharmacist) {
+        return response()->json(['message' => 'Pharmacist not found for this user.'], 404);
+    }
+
+    $pharmaId = $pharmacist->pharma_id;
+
+    // Update pharmaUser
+    $pharmaUser->update([
+        'accept_pharma' => 0,
+        'reason' => $data['reason'],
+        'pharma_id' => $pharmaId,
+    ]);
+
+    // Create delivery request
+    DeliveryRequest::create([
+        'qr' => null,
+        'price' => null,
+        'delivery_id' => null,
+        'pharma_user_id' => $pharmaUser->id,
+    ]);
+
+    // Send notification to user
+    $orderUser = $pharmaUser->user;
+
+if ($orderUser && $orderUser->device_token) {
+    $response = $fcmService->sendNotification(
+        $orderUser->device_token,
+        'Order Refused',
+        'Your order has been refused by the pharmacy. Reason: ' . $data['reason']
+    );}
+
+  return response()->json([
+    'message' => 'Order refused, delivery request created and user notified.',
+    'user' => $orderUser,  // optionally include user info
+], 200);
+}
+
+
 public function handleAccept($userId)
 {
     $user = User::find($userId);
@@ -280,7 +504,7 @@ public function handleAccept($userId)
 
 
     // Optional: set accept_point in Pharmacist model if needed
-    $pharmacist = Pharmacist::where('id', $userId)->first();
+    $pharmacist = Pharmacist::where('user_id', $userId)->first();    
     if ($pharmacist) {
         $pharmacist->update(['accept_point' => 1]);
     }

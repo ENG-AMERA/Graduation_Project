@@ -36,7 +36,8 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         'phone',
         'gender',
         'points',
-        'photo'
+        'photo',
+        'device_token'
     ];
 
     public function roles()

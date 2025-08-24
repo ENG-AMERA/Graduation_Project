@@ -10,7 +10,7 @@ class DeliveryRequest extends Model
     use HasFactory;
 
         protected $fillable = [
-        'qr', 'price', 'pharma_user_id', 'delivery_id','done'
+        'qr', 'price', 'pharma_user_id', 'delivery_id','done','totalprice'
     ];
 
     public function pharmaUser()

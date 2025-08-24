@@ -30,5 +30,13 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+   
+
+       'fcm' => [
+        'credentialsPath'  => storage_path('app/graduationpharma-firebase-adminsdk-fbsvc-fcb183565f.json'),
+        'project_id' => env('FIREBASE_PROJECT_ID'),     
+    ],
+
+  
 
 ];

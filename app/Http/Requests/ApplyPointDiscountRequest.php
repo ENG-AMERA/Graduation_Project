@@ -23,7 +23,7 @@ class ApplyPointDiscountRequest extends FormRequest
     {
        
              return [
-            'order_id' => 'required|exists:orders,id',
+            'cart_id' => 'required|exists:carts,id',
         'points_used' => 'required|integer|min:1',
         ];
     }

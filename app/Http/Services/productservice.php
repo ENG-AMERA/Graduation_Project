@@ -114,7 +114,10 @@ class productservice{
 
 
 
-
+  public function getUserOrderSummariesByUserId(int $userId)
+    {
+        return $this->ProductRepository->getUserOrderSummaries($userId);
+    }
 
 
 

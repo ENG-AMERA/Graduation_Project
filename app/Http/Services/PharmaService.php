@@ -3,8 +3,10 @@
 namespace App\Http\Services;
 
 use App\Http\Repositories\PharmaRepository;
+use App\Models\Pharmacist;
 use Illuminate\Support\Facades\Auth;
 //use App\\Http\Repositories\PharmacistRepository;
+
 
 class PharmaService
 {
@@ -92,16 +94,22 @@ public function createPharma(array $data)
         'pharmacist' => $pharmacist,
     ];
 }
-
+/*
     public function accept($id)
     {
         return $this->pharmaRepository->accept($id);
     }
-    public function deletePharmacist($id)
+    */
+      public function accept(int $id, FcmService $fcmService)
+    {
+        return $this->pharmaRepository->accept($id, $fcmService);
+    }
+
+    public function deletePharmacist($id, FcmService $fcmService)
     {
         try {
             // Call the repository to delete the pharmacist and pharma
-            return $this->pharmaRepository->deletePharmacist($id);
+            return $this->pharmaRepository->deletePharmacist($id, $fcmService);
         } catch (\Exception $e) {
             throw new \Exception("Failed to delete pharmacist and pharma: " . $e->getMessage());
         }
@@ -140,9 +148,10 @@ public function createPharma(array $data)
 }
 
 
-public function refuseOrder(array $data)
+
+public function refuseOrder(array $data, FcmService $fcmService)
 {
-    return $this->pharmaRepository->refuseOrder($data);
+    return $this->pharmaRepository->refuseOrder($data, $fcmService);
 }
 
 
@@ -167,6 +176,47 @@ public function refuseRecommendation($userId)
     public function storeComplaint(array $data)
     {
         return $this->pharmaRepository->store($data);
+    }
+   /*  public function getAcceptPointState()
+    {
+        $userId = auth()->id(); 
+
+        $pharmacist = Pharmacist::where('user_id', $userId)->first();
+
+        return $pharmacist ? (bool) $pharmacist->accept_point : null;
+    }*/
+        
+      public function getAcceptPointState()
+    {
+        $pharmacist = Pharmacist::with(['user:id,firstname,lastname,email,phone,photo', 'pharma:id,name'])
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (! $pharmacist) {
+            return null;
+        }
+
+        return [
+            'id'           => $pharmacist->id,
+            'certificate'  => $pharmacist->certificate,
+            'description'  => $pharmacist->description,
+            'license'      => $pharmacist->license,
+            'accept'       => (bool) $pharmacist->accept,
+            'accept_point' => (bool) $pharmacist->accept_point,
+            'point_value'  => $pharmacist->point_value,
+            'pharma'       => [
+                'id'   => optional($pharmacist->pharma)->id,
+                'name' => optional($pharmacist->pharma)->name,
+            ],
+            'user'         => [
+                'id'        => optional($pharmacist->user)->id,
+                'firstname' => optional($pharmacist->user)->firstname,
+                'lastname'  => optional($pharmacist->user)->lastname,
+                'email'     => optional($pharmacist->user)->email,
+                'phone'     => optional($pharmacist->user)->phone,
+                'photo'     => optional($pharmacist->user)->photo,
+            ],
+        ];
     }
 
 }

@@ -11,7 +11,7 @@ use App\Http\Requests\Refuseorder;
 use App\Http\Requests\StoreComplaintRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use App\Http\Services\FcmService;
 class PharmaController extends Controller
 {
     protected $pharmaService;
@@ -34,18 +34,27 @@ class PharmaController extends Controller
             'data' => $result,
         ], 201);
     }
-
+/*
 
     public function accept(AcceptPharmacistRequest $request)
     {
         $pharmacist = $this->pharmaService->accept($request->id);
         return response()->json(['message' => 'Pharmacist accepted successfully', 'data' => $pharmacist], 200);
     }
-    public function deletePharmacist($id)
+    */
+    public function accept(AcceptPharmacistRequest $request, FcmService $fcmService)
+    {
+       
+        $result = $this->pharmaService->accept($request->id,$fcmService);
+          return response()->json(['message' => 'Pharmacist accepted successfully', 'data' => $result], 200);
+        }
+
+    
+    public function deletePharmacist($id,FcmService $fcmService)
     {
         try {
-            $this->pharmaService->deletePharmacist($id);
-            return response()->json(['message' => 'Pharmacist and pharma deleted successfully.']);
+           $result= $this->pharmaService->deletePharmacist($id,$fcmService);
+            return response()->json(['message' => 'Pharmacist and pharma deleted successfully.', 'data' => $result], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -83,11 +92,13 @@ class PharmaController extends Controller
 }
 
 
-public function refuseOrder(Refuseorder $request)
 
+public function refuseOrder(Refuseorder $request, FcmService $fcmService)
 {
-    return $this->pharmaService->refuseOrder($request->validated());
+    return $this->pharmaService->refuseOrder($request->validated(), $fcmService);
 }
+
+
 
 public function acceptRecommendation()
 {
@@ -121,4 +132,31 @@ public function search(Request $request)
         return response()->json(['message' => 'complaint added successfully', 'data' => $complaint]);
     }
 
+   public function testNotification(Request $request, FcmService $fcmService)
+{
+    $request->validate([
+        'device_token' => 'required|string',
+    ]);
+
+    $deviceToken = $request->input('device_token');
+    $title = 'Test Notification';
+    $body = 'This is a test notification sent from Laravel.';
+
+    $response = $fcmService->sendNotification($deviceToken, $title, $body);
+
+    return response()->json([
+        'message' => 'Notification sent (or attempted)',
+        'fcm_response' => $response,
+    ]);
+}
+
+
+    public function get_state()
+    {
+        $state = $this->pharmaService->getAcceptPointState();
+
+        return response()->json([
+            'accept_point' => $state
+        ]);
+    }
 }

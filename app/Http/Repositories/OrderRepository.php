@@ -86,13 +86,13 @@ public function refuseOrder(array $data)
                 'delivery_requests.price'
             )
             ->get();
-    }*/
-public function getAcceptedOrdersWithPrice()
+    }*/public function getAcceptedOrdersWithPrice()
 {
     $orders = DB::table('pharma_users')
         ->join('orders', 'pharma_users.order_id', '=', 'orders.id')
         ->leftJoin('delivery_requests', 'pharma_users.id', '=', 'delivery_requests.pharma_user_id')
         ->join('pharmas', 'pharma_users.pharma_id', '=', 'pharmas.id')
+        ->join('pharmacists', 'pharmacists.pharma_id', '=', 'pharmas.id') 
         ->where('pharma_users.accept_pharma', 1)
         ->whereNull('pharma_users.accept_user')
         ->select(
@@ -104,7 +104,8 @@ public function getAcceptedOrdersWithPrice()
             'orders.width',
             'orders.type',
             'orders.time',
-            'delivery_requests.price'
+            'delivery_requests.price',
+            'pharmacists.accept_point' 
         )
         ->get();
 
@@ -125,6 +126,7 @@ public function getAcceptedOrdersWithPrice()
 
     return $orders;
 }
+
 
 
 
