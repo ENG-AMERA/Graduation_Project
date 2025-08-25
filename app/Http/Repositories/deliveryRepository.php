@@ -232,6 +232,7 @@ public function calculateDeliveryPrice($lat1, $lon1, $lat2, $lon2)
 
     return round($deliveryPrice, 2);
 }
+/*
 public function getPendingRequestsWithPharmaAndOrder()
 {
     $date = Carbon::now('Asia/Damascus')->toDateString();
@@ -283,15 +284,83 @@ public function getPendingRequestsWithPharmaAndOrder()
         // خزن السعر في DB
         DB::table('delivery_requests')
             ->where('id', $request->request_id)
-            ->update(['totalp
-            
-            rice' => $calculatedPrice]);
+            ->update(['totalprice' => $calculatedPrice]);
+
+        $request->calculated_totalprice = $calculatedPrice;
+    });
+
+    return $requests;
+}*/
+public function getPendingRequestsWithPharmaAndOrder()
+{
+    $date = Carbon::now('Asia/Damascus')->toDateString();
+    $nextDay = Carbon::parse($date, 'Asia/Damascus')->addDay()->toDateString();
+
+    // Fetch global delivery price once (tries plural then singular table names)
+    $globalDeliveryPrice = DB::table('deliveryprices')->value('delivery_price');
+
+    if ($globalDeliveryPrice === null) {
+        $globalDeliveryPrice = DB::table('deliveryprice')->value('delivery_price');
+    }
+
+    // إذا القيمة null → خليها 10
+    $globalDeliveryPrice = $globalDeliveryPrice ?? 10;
+
+    $requests = DB::table('delivery_requests')
+        ->join('pharma_users', 'delivery_requests.pharma_user_id', '=', 'pharma_users.id')
+        ->join('orders', 'pharma_users.order_id', '=', 'orders.id')
+        ->join('pharmas', 'pharma_users.pharma_id', '=', 'pharmas.id')
+        ->join('users', 'pharma_users.user_id', '=', 'users.id')
+        ->whereNull('delivery_requests.done')
+        ->whereNull('delivery_requests.delivery_id')
+        ->where('pharma_users.accept_user', '=', 1)
+        ->where('pharma_users.accept_pharma', '=', 1)
+        ->where(function ($query) use ($date, $nextDay) {
+            $query->whereNull('orders.time')
+                  ->orWhere(function ($q) use ($date, $nextDay) {
+                      $q->where('orders.time', '>=', $date . ' 00:00:00')
+                        ->where('orders.time', '<', $nextDay . ' 00:00:00');
+                  });
+        })
+        ->select(
+            'delivery_requests.id as request_id',
+            'orders.id as order_id',
+            'orders.length as order_length',
+            'orders.width as order_width',
+            'orders.type as order_type',
+            'orders.time as order_time',
+            'delivery_requests.price',
+            'pharmas.id as pharma_id',
+            'pharmas.name as pharma_name',
+            'pharmas.length as pharma_length',
+            'pharmas.width as pharma_width',
+            'users.firstname',
+            'users.lastname',
+            'users.phone',
+            'users.location'
+        )
+        ->get();
+
+    // احسب وخزن السعر
+    $requests->each(function ($request) use ($globalDeliveryPrice) {
+        $calculatedPrice = $this->calculateDeliveryPrice(
+            $request->pharma_length,
+            $request->pharma_width,
+            $request->order_length,
+            $request->order_width,
+            $globalDeliveryPrice
+        );
+
+        DB::table('delivery_requests')
+            ->where('id', $request->request_id)
+            ->update(['totalprice' => $calculatedPrice]);
 
         $request->calculated_totalprice = $calculatedPrice;
     });
 
     return $requests;
 }
+
 
 
 public function getConsumerPendingRequests()
