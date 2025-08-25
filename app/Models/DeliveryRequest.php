@@ -22,4 +22,5 @@ class DeliveryRequest extends Model
     {
         return $this->belongsTo(Delivery::class);
     }
+    
 }

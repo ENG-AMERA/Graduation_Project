@@ -82,6 +82,7 @@ public function getAcceptedRequestsByDelivery()
 
         return DeliveryRequest::with('pharmaUser.user', 'pharmaUser.pharma', 'pharmaUser.order')
             ->where('delivery_id', $delivery->id)
+            ->where('done',null)
             ->get();
     }
 

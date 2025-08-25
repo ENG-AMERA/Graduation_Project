@@ -219,29 +219,33 @@ public function refuseRecommendation($userId)
             ],
         ];
     }
-      public function getAcceptedOrdersForCurrentPharmacist()
-    {
-        $user = Auth::user();
 
-        // لو المستخدم مش صيدلاني أو ما إله سجل Pharmacist
-        $pharmacist = Pharmacist::where('user_id', $user->id)->first();
-        if (!$pharmacist) {
-            // ممكن ترجع Collection فاضية أو ترمي استثناء حسب ستايل مشروعك
-            return 0;
-        }
 
-        // استرجاع سجلات PharmaUser الخاصة بنفس الصيدلية وبالشروط
-        return PharmaUser::with([
-                'order',       // بيانات الطلب
-                'user',        // المستخدم صاحب الطلب (إن احتجته)
-                'pharma',      // الصيدلية
-            ])
-            ->where('pharma_id', $pharmacist->pharma_id)
-            ->where('accept_user', 1)
-            ->where('accept_pharma', 1)
-            ->latest('id')
-            ->get();
+public function getAcceptedOrdersForCurrentPharmacist()
+{
+    $user = Auth::user();
+
+    $pharmacist = Pharmacist::where('user_id', $user->id)->first();
+    if (!$pharmacist) {
+        return 0;
     }
 
-
+    return PharmaUser::with([
+            'order',
+            'user',
+            'pharma',
+            'deliveryRequest' => function ($q) {
+                $q->where('done', 1);
+            },
+        ])
+        ->where('pharma_id', $pharmacist->pharma_id)
+        ->where('accept_user', 1)
+        ->where('accept_pharma', 1)
+        
+        ->whereHas('deliveryRequest', function ($q) {
+            $q->where('done', 1);
+        })
+        ->latest('id') 
+        ->get();
+}
 }
