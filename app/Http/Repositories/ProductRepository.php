@@ -423,8 +423,8 @@ public function getproductofcart($pharma_id)
             return [
                 'order_id'       => $pu->order_id,
                 'pharmacy_name'  => $pu->pharma->name ?? null,
-                'order_price'    => $dr->totalprice ?? null, // سعر الطلبية
-                'delivery_price' => $dr->price ?? null,      // سعر التوصيل
+                'order_price'    => $dr->price ?? null, // سعر الطلبية
+                'delivery_price' => $dr->totalprice ?? null,      // سعر التوصيل
                 'delivery_date'  => $deliveryDate,           // تاريخ التوصيل
                 'type'           => ((int)$pu->type === 1) ? 'private' : 'public',
             ];
