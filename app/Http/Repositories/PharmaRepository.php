@@ -11,6 +11,7 @@ use App\Models\PharmaUser;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Services\FcmService;
+use App\Models\CartOrder;
 use Illuminate\Support\Facades\DB;
 
 class PharmaRepository
@@ -539,5 +540,22 @@ public function searchByName($name)
  public function store(array $data)
     {
         return Complaint::create($data);
+    }
+
+    public function cartorderarchive2(){
+            $user_id=Auth::id();
+            $pharmacist=Pharmacist::where('user_id',$user_id)->first();
+            $pharma_id=$pharmacist->pharma_id;
+
+         $cart_order=CartOrder::where('pharma_id',$pharma_id)
+                            ->where('done',1)
+                           ->where('accepted',1)->where('verified',1)->with('applycartorder')
+                           ->with('applycartorder.delivery')
+                           ->with('cartorderitem.product')
+                           ->with('cartorderitem.type')
+                           ->get();
+         return response()->json([
+            'cart order archive' => $cart_order,
+        ]);
     }
 }

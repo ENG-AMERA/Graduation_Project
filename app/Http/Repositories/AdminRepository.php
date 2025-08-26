@@ -156,7 +156,12 @@ $monthlyOrders = $deliveryData
         ]);
     }
 
-
+public function getdeliveryprice(){
+        $price=deliveryprice::first();
+                    return response()->json([
+            'the value is'=>$price->delivery_price,
+        ]);
+    }
 
 
 

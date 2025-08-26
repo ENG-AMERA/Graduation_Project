@@ -7,19 +7,23 @@ use App\Http\Requests\deliveryRequest;
 use App\Http\Services\deliveryService;
 use App\Http\Requests\AcceptDeliveryRequest;
 use App\Http\Repositories\CartOrdersRepository;
+use App\Http\Repositories\deliveryRepository;
 use App\Http\Services\FcmService;
 
 class delivaryController extends Controller
 {
     protected $deliveryService;
     protected $cartorderrepo;
-
-    public function __construct(deliveryService $deliveryService , CartOrdersRepository $cartorderrepo)
+    protected $deliveryRepository;
+    public function __construct(deliveryService $deliveryService , CartOrdersRepository $cartorderrepo,deliveryRepository   $deliveryRepository)
     {
         $this->deliveryService = $deliveryService;
         $this->cartorderrepo = $cartorderrepo;
+        $this->deliveryRepository = $deliveryRepository;
+
 
     }
+                                    
 
     public function delivery_request(deliveryRequest $request)
     {
@@ -86,5 +90,7 @@ class delivaryController extends Controller
 
         return response()->json($requests);
     }
-
+public function cart_order_archive(){
+        return $this->deliveryRepository->cart_order_archive();
+    }   
 }

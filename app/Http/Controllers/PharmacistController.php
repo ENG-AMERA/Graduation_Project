@@ -9,6 +9,7 @@ use App\Http\Services\productservice;
 use App\Http\Repositories\ArticleRepository;
 use App\Http\Repositories\ProductRepository;
 use App\Http\Repositories\CartOrdersRepository;
+use App\Http\Repositories\PharmaRepository;
 
 class PharmacistController extends Controller
 {
@@ -16,15 +17,15 @@ class PharmacistController extends Controller
        protected $productservice;
        protected $articlerepo;
        protected $cartorderrepo;
-
+       protected $PharmaRepository;
     public function __construct(ProductRepository $productrepo , productservice $productservice ,
-     ArticleRepository $articlerepo , CartOrdersRepository $cartorderrepo)
+     ArticleRepository $articlerepo , CartOrdersRepository $cartorderrepo   ,  PharmaRepository $PharmaRepository)
     {
         $this->productrepo = $productrepo;
          $this->productservice = $productservice;
          $this->articlerepo = $articlerepo;
          $this->cartorderrepo = $cartorderrepo;
-
+          $this->PharmaRepository =$PharmaRepository;
     }
     public function Addproduct(ProductRequest $request)
     {
@@ -80,7 +81,9 @@ class PharmacistController extends Controller
 
 
 
-
+Public function cartorderarchive2(){
+        return $this->PharmaRepository->cartorderarchive2();
+}
 
 
 

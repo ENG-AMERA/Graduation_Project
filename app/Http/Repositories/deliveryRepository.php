@@ -2,11 +2,13 @@
 namespace App\Http\Repositories;
 
 use App\Http\Services\FcmService;
+use App\Models\ApplyCartOrder;
 use App\Models\Delivery;
 use App\Models\deliveryprice;
 use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -17,27 +19,6 @@ class deliveryRepository
         return Delivery::create($data);
     }
    
-   /*
-    public function accept($id)
-    {
-        // Find the pharmacist by ID
-        $delivery = Delivery::findOrFail($id);
-
-        // Update the accept field to 1
-        $delivery->update(['accept' => 1]);
-  
-        // Create the pharmacist role
-        $role = Role::create([
-            'user_id' => $delivery->user_id,
-            'name' => 'delivery'
-        ]);
-          $userid= $delivery->user_id;
-       
-          Role::where('user_id', $userid)->where('name','Consumer')->delete();
-            // Delete the delivery record
-
-        return $delivery;
-    }*/
         public function accept(int $id, FcmService $fcmService)
 {
  
@@ -145,27 +126,7 @@ public function deletdelivery(int $id, FcmService $fcmService)
     } catch (\Throwable $e) {
         throw new \Exception("Error deleting delivery: " . $e->getMessage());
     }
-}/*
-    public function deletdelivery($id)
-    {
-        try {
-            // Find the pharmacist by ID
-            $delivery = Delivery::findOrFail($id);
-    
-           $userid= $delivery->user_id;
-       
-                   $delivery->delete();
-    
-    
-            Role::where('user_id', $userid)->where('name','Delivery')->delete();
-            // Delete the pharmacist record
-    
-            return true;
-        } catch (\Exception $e) {
-            throw new \Exception("Error deleting delivery" . $e->getMessage());
-        }
-    }
-    */
+}
 
        public function getPendingdelivery()
     {
@@ -173,36 +134,6 @@ public function deletdelivery(int $id, FcmService $fcmService)
             ->whereNull('accept')
             ->get();
     }
-
-/*
-public function calculateDeliveryPrice($lat1, $lon1, $lat2, $lon2, $pricePerKm = 2)
-{
-    $earthRadius = 6371; // نصف قطر الأرض بالكيلومتر
-
-    // تحويل الإحداثيات إلى راديان
-    $lat1 = deg2rad($lat1);
-    $lon1 = deg2rad($lon1);
-    $lat2 = deg2rad($lat2);
-    $lon2 = deg2rad($lon2);
-
-    // حساب الفروق
-    $deltaLat = $lat2 - $lat1;
-    $deltaLon = $lon2 - $lon1;
-
-    // معادلة هافرسين
-    $a = sin($deltaLat / 2) ** 2 +
-         cos($lat1) * cos($lat2) * sin($deltaLon / 2) ** 2;
-
-    $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-    $distance = $earthRadius * $c;
-
-    // حساب السعر
-    $deliveryPrice = $distance * $pricePerKm;
-
-    return round($deliveryPrice, 2);
-}
-
-*/
 public function calculateDeliveryPrice($lat1, $lon1, $lat2, $lon2)
 {
     $priceobj=deliveryprice::first();
@@ -232,65 +163,6 @@ public function calculateDeliveryPrice($lat1, $lon1, $lat2, $lon2)
 
     return round($deliveryPrice, 2);
 }
-/*
-public function getPendingRequestsWithPharmaAndOrder()
-{
-    $date = Carbon::now('Asia/Damascus')->toDateString();
-    $nextDay = Carbon::parse($date, 'Asia/Damascus')->addDay()->toDateString();
-
-    $requests = DB::table('delivery_requests')
-        ->join('pharma_users', 'delivery_requests.pharma_user_id', '=', 'pharma_users.id')
-        ->join('orders', 'pharma_users.order_id', '=', 'orders.id')
-        ->join('pharmas', 'pharma_users.pharma_id', '=', 'pharmas.id')
-        ->join('users', 'pharma_users.user_id', '=', 'users.id')
-        ->whereNull('delivery_requests.done')
-        ->whereNull('delivery_requests.delivery_id')
-        ->where('pharma_users.accept_user', '=', 1)
-        ->where('pharma_users.accept_pharma', '=', 1)
-        ->where(function($query) use ($date, $nextDay) {
-            $query->whereNull('orders.time')
-                  ->orWhere(function($q) use ($date, $nextDay) {
-                      $q->where('orders.time', '>=', $date . ' 00:00:00')
-                        ->where('orders.time', '<', $nextDay . ' 00:00:00');
-                  });
-        })
-        ->select(
-            'delivery_requests.id as request_id',
-            'orders.id as order_id',
-            'orders.length as order_length',
-            'orders.width as order_width',
-            'orders.type as order_type',
-            'orders.time as order_time',
-            'delivery_requests.price',
-            'pharmas.name as pharma_name',
-            'pharmas.length as pharma_length',
-            'pharmas.width as pharma_width',
-            'users.firstname',
-            'users.lastname',
-            'users.phone',
-            'users.location'
-        )
-        ->get();
-
-    // احسب وخزن السعر
-    $requests->each(function ($request) {
-        $calculatedPrice = $this->calculateDeliveryPrice(
-            $request->pharma_length,
-            $request->pharma_width,
-            $request->order_length,
-            $request->order_width
-        );
-
-        // خزن السعر في DB
-        DB::table('delivery_requests')
-            ->where('id', $request->request_id)
-            ->update(['totalprice' => $calculatedPrice]);
-
-        $request->calculated_totalprice = $calculatedPrice;
-    });
-
-    return $requests;
-}*/
 public function getPendingRequestsWithPharmaAndOrder()
 {
     $date = Carbon::now('Asia/Damascus')->toDateString();
@@ -383,5 +255,15 @@ public function getConsumerPendingRequests()
         ->get();
 }
 
-
+public function cart_order_archive()
+{
+    $user_id=Auth::id();
+    $delivery=Delivery::where('user_id',$user_id)->first();
+    $delivery_id=$delivery->id;
+     $apply=ApplyCartOrder::where('delivery_id',$delivery_id)->with('cartorder')
+     ->with('cartorder.pharma')->get();
+         return response()->json([
+            'cart order archive' => $apply,
+        ]);
+}
 }

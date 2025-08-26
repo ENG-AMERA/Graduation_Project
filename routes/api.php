@@ -77,7 +77,7 @@ Route::get('getMonthlyOrderCounts', [AdminController::class, 'getMonthlyOrderCou
 Route::post('detect_price', [AdminController::class, 'detect_price']);
 Route::post('edit_price', [AdminController::class, 'edit_price']);
 
-
+Route::get('getdeliveryprice', [AdminController::class, 'getdeliveryprice']); 
 });
 
 Route::middleware(['auth:api', 'consumer'])->group(function () {
@@ -162,7 +162,7 @@ Route::post('refuseRecommendation', [PharmaController::class, 'refuseRecommendat
 Route::post('/test-notification', [PharmaController::class, 'testNotification']);
 Route::post('/get_state', [PharmaController::class, 'get_state']);
 Route::post('/indexAcceptedForPharmacist', [PharmaController::class, 'indexAcceptedForPharmacist']);
-
+Route::get('/cartorderarchive2', [PharmacistController::class, 'cartorderarchive2']);
 
 });
 
@@ -174,7 +174,8 @@ Route::get('/getcartordertodelivery', [delivaryController::class, 'getcartordert
 Route::post('/applycartorder/{id}', [delivaryController::class, 'applycartorder']);
 Route::post('/verifyqrforcartorder', [delivaryController::class, 'verifyqrforcartorder']);
 Route::post('/acceptedRequests', [delivaryController::class, 'acceptedRequests']);
-
+Route::get('/cart_order_archive', [delivaryController::class, 'cart_order_archive']);
+       
 });
 
 

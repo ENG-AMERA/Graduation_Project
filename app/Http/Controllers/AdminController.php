@@ -56,7 +56,9 @@ public function edit_price(Request $request){
     return $this->adminrepo->edit_price($request);
 }
 
-
+public function getdeliveryprice(){
+    return $this->adminrepo->getdeliveryprice();
+}
 
 
 
